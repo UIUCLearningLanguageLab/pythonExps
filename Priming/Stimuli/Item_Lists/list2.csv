@@ -1,0 +1,9 @@
+Fixation,Prime,Mask,Target,Relevant,Corr_response
++,cat,&&&,dog,1,1
++,dog.avi,&&&,shoe,0,1
++,song.wav,&&&,door,0,1
++,foot,&&&,shoe,1,1
++,web,&&&,blog,1,1
++,shirt,&&&,blicket,0,2
++,wind,&&&,storm,1,1
++,tree,&&&,fron,0,2

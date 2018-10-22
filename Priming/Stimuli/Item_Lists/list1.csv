@@ -1,0 +1,9 @@
+Fixation,Prime,Mask,Target,Relevant,Corr_response
++,dog.avi,&&&,leash,1,1
++,dog,&&&,shoe,0,1
++,song.wav,&&&,leash,0,1
++,foot,&&&,shoe,1,1
++,shirt,&&&,blog,0,2
++,shirt,&&&,blicket,0,2
++,tree,&&&,storm,1,2
++,tree,&&&,fron,0,2

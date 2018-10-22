@@ -1,0 +1,9 @@
+ExpName,SubjectID,Item_List,Condition,BlockID,TrialID,Fixation,Prime,Mask,Target,Relevant,Corr_response,Fixation_Time,Prime_Time,Mask_Time,Target_Time,Key_response,RT,ITI_Time
+Priming,165853,list2,soa0050,1,1,+,cat,&&&,dog,1,1,1024.9507,57.6426,48.7985,25.6652,1,453.6456,2013.2979
+Priming,165853,list2,soa0050,1,2,+,song.wav,&&&,door,0,1,1032.6425,10192.621,58.6189,25.3427,1,630.3233,2019.5864
+Priming,165853,list2,soa0050,1,3,+,foot,&&&,shoe,1,1,1032.7974,60.3268,49.614,24.6108,1,670.1465,2013.0654
+Priming,165853,list2,soa0050,1,4,+,wind,&&&,storm,1,1,1032.2214,58.5359,49.5896,24.4194,1,796.3112,2004.1312
+Priming,165853,list2,soa0050,2,1,+,dog.avi,&&&,shoe,0,1,1021.9315,20476.8552,48.5707,25.0289,1,607.9433,2008.9758
+Priming,165853,list2,soa0050,2,2,+,web,&&&,blog,1,1,1032.3184,57.6498,49.2591,24.7611,1,524.1398,2009.8179
+Priming,165853,list2,soa0050,2,3,+,shirt,&&&,blicket,0,2,1035.0808,58.5653,49.4055,24.0458,2,534.9511,2016.2
+Priming,165853,list2,soa0050,2,4,+,tree,&&&,fron,0,2,1032.7636,59.6325,48.595,25.6579,null,2000.5024,2016.6028

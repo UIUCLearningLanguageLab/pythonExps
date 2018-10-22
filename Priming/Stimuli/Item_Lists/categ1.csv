@@ -1,0 +1,13 @@
+Fixation,Prime,Mask,Target,Block,Corr_response,FEEDBACK
++,cat,&&&,dog,1,1,0
++,cat,&&&,tree,1,0,0
++,flower,&&&,tree,1,0,0
++,flower,&&&,dog,1,0,0
++,cat,&&&,dog,2,1,0
++,cat,&&&,tree,2,0,0
++,flower,&&&,tree,2,0,0
++,flower,&&&,dog,2,0,0
++,cat,&&&,dog,PRACTICE,1,1
++,cat,&&&,tree,PRACTICE,0,1
++,flower,&&&,tree,PRACTICE,0,1
++,flower,&&&,dog,PRACTICE,1,1
