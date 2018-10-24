@@ -1,9 +1,0 @@
-ExpName,SubjectID,Item_List,Condition,BlockID,TrialID,Fixation,Prime,Mask,Target,Relevant,Corr_response,Fixation_Time,Prime_Time,Mask_Time,Target_Time,Key_response,RT,ITI_Time
-Priming,136179,list1,soa0250,1,1,+,dog,&&&,shoe,0,1,1038.4824,257.2849,48.6823,24.7531,1,571.7155,2013.0052
-Priming,136179,list1,soa0250,1,2,+,song.wav,&&&,leash,0,1,1035.9587,10423.1043,52.0408,24.4757,null,2000.7421,2016.349
-Priming,136179,list1,soa0250,1,3,+,tree,&&&,storm,1,2,1035.9068,257.7714,48.8121,24.7726,1,142.6984,2006.6817
-Priming,136179,list1,soa0250,1,4,+,tree,&&&,fron,0,2,1036.5565,257.2038,49.3107,25.0946,2,659.7388,2007.549
-Priming,136179,list1,soa0250,2,1,+,dog.avi,&&&,leash,1,1,1027.9848,20728.8327,46.6899,24.5256,1,660.6178,2006.5491
-Priming,136179,list1,soa0250,2,2,+,foot,&&&,shoe,1,1,1026.6665,258.4018,49.5786,24.2005,1,743.5652,2006.6232
-Priming,136179,list1,soa0250,2,3,+,shirt,&&&,blog,0,2,1035.3181,258.2139,49.3378,24.4659,1,598.1831,2017.929
-Priming,136179,list1,soa0250,2,4,+,shirt,&&&,blicket,0,2,1037.152,256.6026,49.6122,24.4313,2,513.1652,2004.0627

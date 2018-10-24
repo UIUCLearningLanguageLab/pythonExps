@@ -1,0 +1,3 @@
+MAMMAL#Hello! Its' the mammal block.
+PLANT#Hello! It's the plant block.
+TEST#You will now complete the next portion of the experiment. It will consist of 4 trials and will take approximately 30 seconds. When you are ready, press the space bar to begin.

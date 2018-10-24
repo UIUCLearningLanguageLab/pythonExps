@@ -1,9 +1,0 @@
-ExpName,SubjectID,Item_List,Condition,BlockID,TrialID,Fixation,Prime,Mask,Target,Relevant,Corr_response,Feedback,Fixation_Time,Prime_Time,Mask_Time,Target_Time,Key_response,RT,ITI_Time
-Priming,585981,list3,soa0500,1,1,+,foot,&&&,shoe,1,1,song.wav,1033.2347,507.7155,52.0847,24.0111,1,351.918,2016.1538
-Priming,585981,list3,soa0500,1,2,+,web,&&&,blog,1,1,song.wav,1033.0651,507.8903,49.0127,23.4635,2,119.1259,2019.4273
-Priming,585981,list3,soa0500,1,3,+,shirt,&&&,blicket,0,2,song.wav,1033.1655,507.5138,51.9417,23.7048,2,823.4813,2011.4034
-Priming,585981,list3,soa0500,1,4,+,wind,&&&,storm,1,1,song.wav,1032.8859,508.1821,49.0379,24.5494,1,477.9269,2008.0223
-Priming,585981,list3,soa0500,2,1,+,dog,&&&,cat,1,1,song.wav,1028.8813,507.8564,48.6441,24.6568,1,509.709,2008.352
-Priming,585981,list3,soa0500,2,2,+,cat,&&&,shoe,0,1,song.wav,1034.1277,508.3654,49.5296,24.2257,2,343.9909,2018.1012
-Priming,585981,list3,soa0500,2,3,+,door,&&&,dog,0,1,song.wav,1032.4234,509.7703,47.6955,24.6928,1,603.4972,2020.7451
-Priming,585981,list3,soa0500,2,4,+,tree,&&&,fron,0,2,song.wav,1032.335,509.0952,48.4367,23.4023,2,572.6821,2010.7681

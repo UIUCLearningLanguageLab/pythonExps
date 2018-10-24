@@ -1,0 +1,9 @@
+ExpName,SubjectID,Item_List,Condition,BlockID,TrialID,Fixation,Prime,Mask,Target,Block_Name,Relevant,Corr_response,Fixation_Time,Prime_Time,Mask_Time,Target_Time,Key_response,RT,ITI_Time
+Priming,156323,list1,soa0500,0,1,+,dog,&&&,leash,PRACTICE,1,1,1032.5708,507.4989,48.3459,24.6971,1,419.0495,2015.9511
+Priming,156323,list1,soa0500,0,2,+,dog,&&&,shoe,PRACTICE,0,1,1027.05,507.8259,48.8818,24.81,2,519.0142,2016.2193
+Priming,156323,list1,soa0500,1,1,+,shirt,&&&,blog,TEST,0,2,1040.4813,507.5122,49.1661,25.0166,1,492.8444,2006.7364
+Priming,156323,list1,soa0500,1,2,+,shirt,&&&,blicket,TEST,0,2,1038.4514,506.5303,50.4164,24.3339,2,425.5865,2008.7164
+Priming,156323,list1,soa0500,1,3,+,tree,&&&,storm,TEST,1,2,1034.7257,508.1191,48.8592,23.759,1,506.9261,2011.772
+Priming,156323,list1,soa0500,2,1,+,song,&&&,leash,TEST,0,1,1027.6207,508.3326,48.2202,24.2379,1,432.8046,2021.4144
+Priming,156323,list1,soa0500,2,2,+,foot,&&&,shoe,TEST,1,1,1034.0528,507.7981,48.9128,24.515,1,360.8387,2006.373
+Priming,156323,list1,soa0500,2,3,+,tree,&&&,fron,TEST,0,2,1033.7386,512.0584,48.0051,25.7025,null,2000.5003,2017.3605
