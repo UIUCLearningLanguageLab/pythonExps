@@ -5,29 +5,6 @@ import csv
 import random
 import os
 
-''' for all events:
-        if what follows the event name is a number, present the stimulus for that amount of time 
-            if thats text, then just show for that long
-            if that's a .mp4 or .wav, play it for that long. if the file is longer, cut it off
-        if what follows the event name is a W with a number (like W100), then add a wait time of 100 ms
-        if what follows is the event name with a P with a number (like P1000), then "pad" the total time to that length Done
-'''
-
-''' if item files have a column called "FEEDBACK", use that to determine if you tell someone with an annoying beep if they got it wrong"'''
-
-''' item files must have a BLOCK column
-    some item's BLOCK value will be PRACTICE, put those in the practice block, which always comes first
-    some item's BLOCK value will be TEST, in which case, randomize them the original way
-    some item's BLOCK value will be a lower-case string, in which case group the items into those blocks,
-        randomize the order of items within a block
-        randomize the order of the blocks (but not practice block)
-
-    if items file has BLOCK values other than PRACTICE and TEST, 
-        config file's BLOCK value should be -1
-'''
-''' figure out what kinds of movie file formats we can use'''
-
-'''think about how we can have different insructions for each block'''
 
 EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
@@ -49,6 +26,10 @@ win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
 
 
 def display_instruction_words(instruction_text):
+    """
+    Get one line from the instruction text and display
+    Wait 'space' to continue
+    """
     words = visual.TextStim(win, text=instruction_text.replace(r'\n', '\n'),
                             height=INSTRUCTION_TEXT_HEIGHT,
                             pos=(0.0, 0.0),
@@ -61,6 +42,13 @@ def display_instruction_words(instruction_text):
 
 
 def display_event_words(event_text, duration, key_list, type):
+    """
+    When type equals to 'N', all display events will display the time as the input duration
+    when movie and music longer than that duration, just cut it
+    when movie and music shorter than that time, then wait after they end;
+    When type equals to 'W', image and text still display for duration time,
+    for movie and music, wait a duration time after they end.
+    """
     timer = core.Clock()
     timer.reset()
     win.flip()
@@ -106,6 +94,10 @@ def display_event_words(event_text, duration, key_list, type):
         words.draw()
         win.flip()
         core.wait(duration)
+    """
+    When key_list is None, only return the time for display the event
+    Else return the time of display, key_press, and the time wait until get a keypress
+    """
     if key_list is None:
         timeUse = timer.getTime()
         return round(timeUse * 1000, 4)
@@ -121,6 +113,10 @@ def display_event_words(event_text, duration, key_list, type):
 
 
 def show_instructions(filePathName, name=None):
+    """
+    Display the main instructions and block instructions
+    For block instructions, display the text according to the block name
+    """
     if name == None:
         with open(filePathName) as fp:
             introduction = fp.readlines()
@@ -163,6 +159,9 @@ def load_data(filePath):
 
 
 def verify_items_and_events(item_data, trial_event_list):
+    """
+    Check whether all events are include in item list
+    """
     item_data_list = item_data.columns.values.tolist()
     for i in range(len(trial_event_list)):
         if trial_event_list[i][0] not in item_data_list:
@@ -173,15 +172,17 @@ def verify_items_and_events(item_data, trial_event_list):
 
 def prepare_pairs(item_data, config_dict):
     """
-    This function randomize the order of item_data
-    and return the list of item data for each block
+    This function randomize the order of item_data and return the list of item data for practice
+    and each block
+    A list of things done:
+    1. check whether it has a feedback column, if there is, show image or display sound when the 
+    answer is wrong
+    2. when num_blocks is positive, there are only PRACTICE and TEST, 
+    and all PRACTICE are list before TEST in csv file, and here random assign TEST to blocks;
+    when num_blocks is negative, there are other Block_Name than PRACTICE and TEST, assign data to block
+    according to the block_name, and shuffle the data in each block. The display order of block is same as
+    the NAME_SET in config file, and always put PRACTICE first.
     """
-
-    # somewhere in here
-    # if the ending of a item is .mp3, we know its an audio stimulus with that name in the stimuli/audio directory
-    # example, Target, leash.mp3 should look for and play the leash audio stimulus instead of printing "leash" to screen
-    # example Target leash.jpg should look for the image leash.jpg in the the stimuli/images directory, and display that instead of printing leash to screen
-    # ditto for leash.avi will know to look for and play a movie in the stimuli movie directory
     global FEEDBACK
     if 'Feedback' in item_data.columns.values.tolist():
         FEEDBACK = True
@@ -235,6 +236,9 @@ def prepare_pairs(item_data, config_dict):
 
 
 def prepare_output_header(assigned_item_data, trial_block_list, trial_event_list, config_dict):
+    """
+    prepare the header for the output file
+    """
     header_row = []
     header_row.extend(('ExpName', 'SubjectID', 'Item_List', 'Condition'))
     header_row.extend(('BlockID', 'TrialID'))
@@ -255,6 +259,9 @@ def prepare_output_header(assigned_item_data, trial_block_list, trial_event_list
 
 
 def experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list):
+    """
+    This is the experiment function
+    """
     num_blocks = int(config_dict['BLOCKS'])
     show_instructions('Stimuli/Instructions/main_instructions.txt')
     prepare_output_header(assigned_item_data, trial_block_list, trial_event_list, config_dict)
@@ -276,9 +283,11 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
             show_instructions('Stimuli/Instructions/block_break.txt')
 
 
-# a function that prepares the output file
 
 def block(item_data_frame, trial_event_list, block_num, config_dict):
+    """
+    This function excute each trial with all events in order.
+    """
     num_trials = len(item_data_frame)
     num_events = len(trial_event_list)
     key = config_dict['KEY']
@@ -345,6 +354,9 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
 
 
 def prepare(config_dict, condition_dict):
+    """
+    This fuction prepare the globle varibles
+    """
     global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME
     file = os.path.basename(__file__)
     EXPNAME = os.path.splitext(file)[0]
@@ -362,7 +374,6 @@ def main():
     config_dict = load_dict('config.csv')
     condition_dict = load_dict('conditions.csv')
     prepare(config_dict, condition_dict)
-    # practice_item_data = load_data('Stimuli/Item_Lists/practice_items.csv')
     item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
     trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
     if verify_items_and_events(item_data, trial_event_list):
