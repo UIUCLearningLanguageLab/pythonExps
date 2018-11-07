@@ -4,7 +4,7 @@ import pandas as pd
 import csv
 import random
 import os
-
+import collections
 
 EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
@@ -49,12 +49,34 @@ def display_event_words(event_text, duration, key_list, type):
     When type equals to 'W', image and text still display for duration time,
     for movie and music, wait a duration time after they end.
     """
+    pos = collections.defaultdict(dict)
+    pos[1][1] = (0, 0)
+    pos[2][1] = (-0.5, 0)
+    pos[2][2] = (0.5, 0)
+    pos[4][1] = (-0.5, 0.5)
+    pos[4][2] = (0.5, 0.5)
+    pos[4][3] = (-0.5, -0.5)
+    pos[4][4] = (0.5, -0.5)
+    
     timer = core.Clock()
     timer.reset()
     win.flip()
-    if '.jpg' in event_text:
-        pic = visual.ImageStim(win, image='Stimuli/Images/' + event_text)
-        pic.draw()
+    if '.jpg' in event_text and '.wav' in event_text:
+        cur_events = event_text.split(' ')
+        pic = {}
+        for i in range(len(cur_events)-1):
+            pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ cur_events[i], size = [0.8, 0.8], pos = pos[len(cur_events)-1][i+1])
+            pic[i].draw()
+        win.flip()
+        audio = sound.Sound('Stimuli/Audio/' + cur_events[-1])
+        audio.play()
+        core.wait(duration)
+    elif '.jpg' in event_text:
+        pictures = event_text.split(' ')
+        pic = {}
+        for i in range(len(pictures)):
+            pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], size = [0.8, 0.8], pos = pos[len(pictures)][i+1])
+            pic[i].draw()
         win.flip()
         core.wait(duration)
     elif '.avi' in event_text:
@@ -85,13 +107,16 @@ def display_event_words(event_text, duration, key_list, type):
             core.wait(duration)
             audio.stop()
     else:
-        words = visual.TextStim(win, text=event_text,
+        texts = event_text.split(' ')
+        words = {}
+        for i in range(len(texts)):
+            words[i] = visual.TextStim(win, text=texts[i],
                                 height=EVENT_TEXT_HEIGHT,
-                                pos=(0.0, 0.0),
+                                pos=pos[len(texts)][i+1],
                                 color=EVENT_TEXT_COLOR,
                                 bold=False,
                                 italic=False)
-        words.draw()
+            words[i].draw()
         win.flip()
         core.wait(duration)
     """
