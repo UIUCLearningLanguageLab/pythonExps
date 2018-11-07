@@ -71,6 +71,7 @@ def display_event_words(event_text, duration, key_list, type):
         audio = sound.Sound('Stimuli/Audio/' + cur_events[-1])
         audio.play()
         core.wait(duration)
+        audio.stop()
     elif '.jpg' in event_text:
         pictures = event_text.split(' ')
         pic = {}
