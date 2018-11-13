@@ -21,6 +21,8 @@ SUBJECTID = ''
 ITEM_LIST = ''
 CONDITION = ''
 FEEDBACK = False
+RAND_BLOCKS = True
+RAND_WITHIN_BLOCKS = True
 
 win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
 
@@ -130,8 +132,10 @@ def display_event_words(event_text, duration, key_list, type):
     else:
         timeUse_display = timer.getTime()
         timer.reset()
+        # wait for the keypress
         key_press = event.waitKeys(keyList=key_list, maxWait=TIME_OUT)
         if key_press == None:
+            # get the time uesed for reaction
             timeUse_action = timer.getTime()
             return round(timeUse_display * 1000, 4), 'null', round(timeUse_action * 1000, 4)
         timeUse_action = timer.getTime()
@@ -215,10 +219,13 @@ def prepare_pairs(item_data, config_dict):
     num_blocks = int(config_dict['BLOCKS'])
     name_set = config_dict['NAME_SET'].split(' ')
     num_items = len(item_data)
+    
+    # for situation with only PRACTICE and TEST
     if num_blocks > 0:
         block_list = []
         current_block = 1
-        count = 0;
+        count = 0; # count the number of practice pairs
+        # Assign the block number
         for i in range(num_items):
             if item_data.loc[i, "Block_Name"] == 'PRACTICE':
                 count += 1
@@ -229,22 +236,31 @@ def prepare_pairs(item_data, config_dict):
                 current_block += 1
             else:
                 current_block = 1
-        block_list_copy = block_list[count:]
-        random.shuffle(block_list_copy)
-        block_list[count:] = block_list_copy
+        if RAND_BLOCKS == True:
+            block_list_copy = block_list[count:]
+            # shuffle the list of block numbers
+            random.shuffle(block_list_copy)
+            block_list[count:] = block_list_copy
 
+        # assign the block number to "Block" column
         for i in range(len(item_data)):
             item_data.loc[i, "Block"] = block_list[i]
 
+        # get the practice list
         practice_list = item_data[item_data["Block"] == 0]
         practice_list = practice_list.reset_index()
 
+        # assign the pairs into each block according to the "Block" value
         trial_block_list = []
         for i in range(num_blocks):
             block_dataframe = item_data[item_data["Block"] == i + 1]
+            if RAND_WITHIN_BLOCKS == True:
+                # shuffle within the block
+                block_dataframe = block_dataframe.sample(frac=1)
             trial_block_list.append(block_dataframe.reset_index())
 
         return item_data, trial_block_list, practice_list
+    # for situations with other than TEST
     else:
         for i in range(num_items):
             block_name = item_data.loc[i, "Block_Name"]
@@ -254,9 +270,11 @@ def prepare_pairs(item_data, config_dict):
         practice_list = practice_list.reset_index()
 
         trial_block_list = []
+        # assign pairs to block according to their "Block_Name" value
         for i in range(1, len(name_set)):
             block_dataframe = item_data[item_data["Block"] == i]
-            block_dataframe = block_dataframe.sample(frac=1)
+            if RAND_WITHIN_BLOCKS == True:
+                block_dataframe = block_dataframe.sample(frac=1)
             trial_block_list.append(block_dataframe.reset_index())
         return item_data, trial_block_list, practice_list
 
@@ -288,13 +306,17 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
     """
     This is the experiment function
     """
+    # get the number of block
     num_blocks = int(config_dict['BLOCKS'])
     show_instructions('Stimuli/Instructions/main_instructions.txt')
     prepare_output_header(assigned_item_data, trial_block_list, trial_event_list, config_dict)
     name_flag = False
+    # When there are PRACTICE pairs
     if len(practice_list) > 0:
         show_instructions('Stimuli/Instructions/practice_instructions.txt')
         block(practice_list, trial_event_list, 0, config_dict)
+    # When there are other "Block_Name" than TEST, get the number of block according to 
+    # the NAME_SET
     if num_blocks < 0:
         num_blocks = len(config_dict['NAME_SET'].split(' ')) - 1
         name_flag = True
@@ -330,6 +352,7 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
             valid_key_list = ''
             event_name = trial_event_list[j][0]
             type = 'N'
+            # if this step need a key press
             if trial_event_list[j][1] == "KEY":
                 type = 'W'
                 duration = 0
@@ -337,11 +360,12 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
             else:
                 str = trial_event_list[j][1][0]
                 if str == 'W':
+                    # type 'W' means wait after sound or video fully displayed
                     type = 'W'
                     duration = float(int(trial_event_list[j][1][1:]) / 1000)
                 else:
                     duration = float(int(trial_event_list[j][1]) / 1000)
-
+            # break between pairs
             if event_name == 'ITI':
                 timer = core.Clock()
                 timer.reset()
@@ -350,10 +374,12 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
                 timeUse = timer.getTime()
                 row.append(round(timeUse * 1000, 4))
             else:
+                # need display the pairs
                 event_text = item_data_frame.loc[i, event_name]
                 if valid_key_list != '':
                     res = display_event_words(event_text, duration, valid_key_list, type)
                     corr_response = item_data_frame.loc[i, 'Corr_response'].astype('str')
+                    # if feedback is need, display the sound and text
                     if FEEDBACK == True:
                         if res[1] != corr_response:
                             audio = sound.Sound('Stimuli/Audio/' + item_data_frame.loc[i, 'Feedback'])
@@ -381,19 +407,25 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
 
 def prepare(config_dict, condition_dict):
     """
-    This fuction prepare the globle varibles
+    This fuction prepare the globle varibles from information in cofig.csv and conditions.csv
     """
-    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME
+    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS
     file = os.path.basename(__file__)
+    # get the expriment name
     EXPNAME = os.path.splitext(file)[0]
     TIME_OUT = float(config_dict['TIMEOUT']) / 1000
     items = condition_dict['items'].split(' ')
+    # get the item list in random
     ITEM_LIST = str(items[random.randint(0, len(items) - 1)])
     conditions = condition_dict['trial_events'].split(' ')
+    # get the condition in random
     CONDITION = str(conditions[random.randint(0, len(conditions) - 1)])
+    # randomly generate a subject id
     SUBJECTID = random.randint(10 ** 5, 10 ** 6)
-
+    # generate the file name for output
     FILE_NAME = EXPNAME + '_' + str(SUBJECTID)
+    RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
+    RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
 
 
 def main():
