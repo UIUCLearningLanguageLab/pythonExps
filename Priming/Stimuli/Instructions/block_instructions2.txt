@@ -1,3 +1,9 @@
-MAMMAL#Hello! Its' the mammal block.
-PLANT#Hello! It's the plant block.
 TEST#You will now complete the next portion of the experiment. It will consist of 4 trials and will take approximately 30 seconds. When you are ready, press the space bar to begin.
+BIRD#In the following trials, you will be deciding if the 2nd word is a bird.\nPress 1 if the 2nd word is a bird. Press 2 if the 2nd word is not a bird.\nPress the space bar when you are ready to begin.
+CLOTHING#In the following trials, you will be deciding if the 2nd word is a type of clothing.\nPress 1 if the 2nd word is a type of clothing. Press 2 if the 2nd word is not a type of clothing.\nPress the space bar when you are ready to begin.
+FRUIT#In the following trials, you will be deciding if the 2nd word is a fruit.\nPress 1 if the 2nd word is a fruit. Press 2 if the 2nd word is not a fruit.\nPress the space bar when you are ready to begin.
+MAMMAL#In the following trials, you will be deciding if the 2nd word is a mammal.\nPress 1 if the 2nd word is a mammal. Press 2 if the 2nd word is not a mammal.\nPress the space bar when you are ready to begin.
+TOOL#In the following trials, you will be deciding if the 2nd word is a tool.\nPress 1 if the 2nd word is a tool. Press 2 if the 2nd word is not a tool./nPress the space bar when you are ready to begin.
+VEGETABLE#In the following trials, you will be deciding if the 2nd word is a vegetable.\nPress 1 if the 2nd word is a vegetable. Press 2 if the 2nd word is not a vegetable.\nPress the space bar when you are ready to begin.
+VEHICLE#In the following trials, you will be deciding if the 2nd word is a vehicle.\nPress 1 if the 2nd word is a vehicle. Press 2 if the 2nd word is not a vehicle.\nPress the space bar when you are ready to begin.
+WEAPON#In the following trials, you will be deciding if the 2nd word is a weapon.\nPress 1 if the 2nd word is a weapon. Press 2 if the 2nd word is not a weapon.\nPress the space bar when you are ready to begin.
