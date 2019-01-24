@@ -1,0 +1,3 @@
+Fixation,Target,Block_Name,Relevant,Corr_response
++,dog.jpg cat.jpeg sound.wav,TEST,1,1
++,shoes.jpg, monkey.jpg sound.wav,TEST,0,1
