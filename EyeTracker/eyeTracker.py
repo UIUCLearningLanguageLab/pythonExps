@@ -1,6 +1,7 @@
 from psychopy import visual, core, event, monitors, tools, prefs
 prefs.general['audioLib'] = ['pygame']
 from psychopy import sound
+import pandas as pd
 import collections, pylink, os, numpy, csv, random
 from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy 
 
@@ -18,7 +19,7 @@ RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
 
-def display_event(event_text, key_list, duration, tracker, monitor):
+def display_event(event_text, duration, key_list, tracker, monitor):
     tracker.sendMessage("!V CLEAR 0 0 0 ")	
 	
     pos = collections.defaultdict(dict)
@@ -33,13 +34,13 @@ def display_event(event_text, key_list, duration, tracker, monitor):
     if '.jpg' in event_text or '.jpeg' in event_text:
         
         pictures = event_text.split(' ')
-        n = len(pictures)
+        n = len(pictures)-1
         pic = {}
         for i in range(n):
-            pic[i] = visual.ImageStim(win, image = 'img/'+ pictures[i], size = [0.8, 0.8], pos = pos[n][i+1])
+            pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], size = [0.8, 0.8], pos = pos[n][i+1])
             pic[i].draw()
 			
-            tracker.sendMessage("!V IMGLOAD CENTER ./img/%s %d %d %d %d" %(pictures[i], (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0]), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1]), int(win.size[0]/n*0.8), int(win.size[1]/n*0.8) ))
+            tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0]), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1]), int(win.size[0]/n*0.8), int(win.size[1]/n*0.8) ))
             
             tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0])-int((win.size[0]/n*0.8)/n), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1])- int((win.size[1]/n*0.8)/n),(win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0]) + int((win.size[0]/n*0.8)/n), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1])+ int((win.size[1]/n*0.8)/n), pictures[i] ))
             tracker.sendMessage("!V TRIAL_VAR Picture%d %s" %(i, str(pictures[i])))
@@ -55,19 +56,21 @@ def display_event(event_text, key_list, duration, tracker, monitor):
                                 bold=False,
                                 italic=False)
             words[i].draw()
-            tracker.sendMessage("!V IAREA RECTANGLE 1%d %d %d %d %d %s" %(int(i),(win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0])-int((win.size[0]/n*0.8)/n),(win.size[1]/n) + ((win.size[1]/n)*pos[n][i+1][1])-int((win.size[1]/n*0.8)/n), (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0])+int((win.size[0]/n*0.8)/n),(win.size[1]/n) + ((win.size[1]/n)*pos[n][i+1][1])+int((win.size[1]/n*0.8)/n), str(texts[i])))
+            tracker.sendMessage("!V IAREA RECTANGLE 1%d %d %d %d %d %s" %(int(i),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/n*0.8)/2),(win.size[1]/2) + ((win.size[1]/2)*pos[n][i+1][1])-int((win.size[1]/2*0.8)/2), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])+int((win.size[0]/2*0.8)/2),(win.size[1]/2) + ((win.size[1]/2)*pos[n][i+1][1])+int((win.size[1]/2*0.8)/2), str(texts[i])))
             tracker.sendMessage("!V TRIAL_VAR Words %s" %(str(texts[i])))
 
     win.flip()
     tracker.sendMessage("DisplayOnset_%s" %(event_text))
     
     if len(event_text.split(' ')) > 1:
-        currentAudio = 'audio/' + events_text.split(' ')[-1]
+        currentAudio = 'Stimuli/Audio/' + event_text.split(' ')[-1]
         audio = sound.Sound(currentAudio)
         audio.play()
         tracker.sendMessage("AudioOnset")
-        core.wait(audio.getDuration())
+        core.wait(5)
+        #core.wait(audio.getDuration())
         audio.stop()
+        print(key_list)
         key_press = event.waitKeys(keyList=key_list,maxWait=TIME_OUT)
         tracker.sendMessage("Response")
         tracker.sendMessage("!V TRIAL_VAR Response %s" %( key_press))
@@ -233,7 +236,7 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
     num_events = len(trail_event_list)
     key = config_dict['KEY']
 
-    for i in num_trails:
+    for i in range(num_trails):
         # log trial onset message
         tracker.sendMessage("TRIALID 0 %d" % i)
 
@@ -282,7 +285,7 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
                 if valid_key_list != '':
                     display_event(event_text, duration, valid_key_list,tracker,monitor)
                 else:
-                    display_event_words(event_text, duration, None,tracker,monitor)
+                    display_event(event_text, duration, None,tracker,monitor)
 
         win.flip()
     
@@ -304,7 +307,7 @@ def eyelink_prepare(tracker, win, monitor, edfFileName):
 	tracker.openDataFile(edfFileName)
 	
 	# Note here that getEYELINK() is equivalent to tk, i.e., the currently initiated EyeLink tracker instance
-	tracker.sendCommand("add_file_preamble_text = PictureTest")
+	tracker.sendCommand("add_file_preamble_text = EyeTracker")
 
         # get window size
 	[scnWidth, scnHeight] = win.size
@@ -385,7 +388,7 @@ def prepare(config_dict, condition_dict):
     # randomly generate a subject id
     SUBJECTID = random.randint(10 ** 5, 10 ** 6)
     # generate the file name for output
-    FILE_NAME = EXPNAME + '_' + str(SUBJECTID)
+    FILE_NAME = EXPNAME + str(SUBJECTID)+ '.edf'
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
     RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
 
@@ -405,7 +408,8 @@ if __name__=="__main__":
     else:
         tk = pylink.EyeLink('100.1.1.1')
     # Enter subject name
-    edfFileName = 'Data/' + FILE_NAME + '.edf'
+    edfFileName = 'test.edf'
+    print(edfFileName)
     # set monitor
     mon = monitors.Monitor('myMon', width=33.7, distance=60.0)
     # define window
