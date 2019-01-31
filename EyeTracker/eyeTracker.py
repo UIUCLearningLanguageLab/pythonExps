@@ -60,9 +60,9 @@ def display_event(event_text, duration, key_list, tracker, monitor):
             pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], size = [0.8, 0.8], pos = pos[n][i+1])
             pic[i].draw()
 
-            tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0]), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1]), int(win.size[0]/n*0.8), int(win.size[1]/n*0.8) ))
+            tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1]), int(win.size[0]/2*0.8), int(win.size[1]/2*0.8) ))
             
-            tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0])-int((win.size[0]/n*0.8)/n), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1])- int((win.size[1]/n*0.8)/n),(win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0]) + int((win.size[0]/n*0.8)/n), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1])+ int((win.size[1]/n*0.8)/n), pictures[i] ))
+            tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])- int((win.size[1]/2*0.8)/2),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]) + int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])+ int((win.size[1]/2*0.8)/2), pictures[i] ))
             tracker.sendMessage("!V TRIAL_VAR Picture%d %s" %(i, str(pictures[i])))
     else:
         texts = event_text.split(' ')
@@ -76,7 +76,7 @@ def display_event(event_text, duration, key_list, tracker, monitor):
                                 bold=False,
                                 italic=False)
             words[i].draw()
-            tracker.sendMessage("!V IAREA RECTANGLE 1%d %d %d %d %d %s" %(int(i),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/n*0.8)/2),(win.size[1]/2) + ((win.size[1]/2)*pos[n][i+1][1])-int((win.size[1]/2*0.8)/2), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])+int((win.size[0]/2*0.8)/2),(win.size[1]/2) + ((win.size[1]/2)*pos[n][i+1][1])+int((win.size[1]/2*0.8)/2), str(texts[i])))
+            tracker.sendMessage("!V IAREA RECTANGLE 1%d %d %d %d %d %s" %(int(i),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/2*0.8)/2),(win.size[1]/2) + ((win.size[1]/2)*pos[n][i+1][1])-int((win.size[1]/2*0.8)/2), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])+int((win.size[0]/2*0.8)/2),(win.size[1]/2) + ((win.size[1]/2)*pos[n][i+1][1])+int((win.size[1]/2*0.8)/2), str(texts[i])))
             tracker.sendMessage("!V TRIAL_VAR Words %s" %(str(texts[i])))
 
     win.flip()
@@ -436,7 +436,7 @@ def prepare(config_dict, condition_dict):
     # randomly generate a subject id
     SUBJECTID = random.randint(10 ** 5, 10 ** 6)
     # generate the file name for output
-    FILE_NAME = EXPNAME + str(SUBJECTID)+ '.edf'
+    FILE_NAME = str(SUBJECTID)+ '.edf'
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
     RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
 
@@ -456,7 +456,7 @@ if __name__=="__main__":
     else:
         tk = pylink.EyeLink('100.1.1.1')
     # Enter subject name
-    edfFileName = 'test.edf'
+    edfFileName = FILE_NAME
     print(edfFileName)
     # set monitor
     mon = monitors.Monitor('myMon', width=33.7, distance=60.0)
