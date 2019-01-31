@@ -18,10 +18,30 @@ FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
+INSTRUCTION_TEXT_HEIGHT = 0.1
+INSTRUCTION_FONT = 'Arial'
+INSTRUCTION_TEXT_COLOR = 'white'
+
+
+def display_instruction_words(instruction_text):
+    """
+    Get one line from the instruction text and display
+    Wait 'space' to continue
+    """
+    words = visual.TextStim(win, text=instruction_text.replace(r'\n', '\n'),
+                            height=INSTRUCTION_TEXT_HEIGHT,
+                            pos=(0.0, 0.0),
+                            color=INSTRUCTION_TEXT_COLOR,
+                            bold=False,
+                            italic=False)
+    words.draw()
+    win.flip()
+    key_press = event.waitKeys(keyList=['space'])
+
 
 def display_event(event_text, duration, key_list, tracker, monitor):
-    tracker.sendMessage("!V CLEAR 0 0 0 ")	
-	
+    tracker.sendMessage("!V CLEAR 0 0 0 ")
+
     pos = collections.defaultdict(dict)
     pos[1][1] = (0, 0)
     pos[2][1] = (-0.5, 0)
@@ -39,7 +59,7 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         for i in range(n):
             pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], size = [0.8, 0.8], pos = pos[n][i+1])
             pic[i].draw()
-			
+
             tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0]), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1]), int(win.size[0]/n*0.8), int(win.size[1]/n*0.8) ))
             
             tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0])-int((win.size[0]/n*0.8)/n), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1])- int((win.size[1]/n*0.8)/n),(win.size[0]/n) + ((win.size[0]/n)*pos[n][i+1][0]) + int((win.size[0]/n*0.8)/n), (win.size[1]/n)+((win.size[1]/n)*pos[n][i+1][1])+ int((win.size[1]/n*0.8)/n), pictures[i] ))
@@ -92,9 +112,12 @@ def display_event(event_text, duration, key_list, tracker, monitor):
 # 		rv.append(line)
 # 	return rv
 
+
 """
 Preparation Part
 """
+
+
 def load_dict(dict_file):
     res_dict = {}
     f = open(dict_file)
@@ -106,6 +129,25 @@ def load_dict(dict_file):
             print('ERROR in' + dict_file + 'in Row {}'.format(data))
             sys.exit(2)
     return res_dict
+
+
+def show_instructions(filePathName, name=None):
+    """
+    Display the main instructions and block instructions
+    For block instructions, display the text according to the block name
+    """
+    if name == None:
+        with open(filePathName) as fp:
+            introduction = fp.readlines()
+        for i in range(len(introduction)):
+            display_instruction_words(introduction[i])
+    else:
+        res_dict = {}
+        file = open(filePathName)
+        for line in file:
+            data = (line.strip('\n')).split('#')
+            res_dict[data[0]] = data[1]
+        display_instruction_words(res_dict[name])
 
 
 def load_trail_events(trail_event_file):
@@ -214,9 +256,11 @@ def prepare_pairs(item_data, config_dict):
 def experiment(assigned_item_data, trail_block_list, trail_event_list, config_dict, practice_list, tracker, monitor):
     
     num_blocks = int(config_dict['BLOCKS'])
+    show_instructions('Stimuli/Instructions/main_instructions.txt')
     name_flag = False
     # When there are PRACTICE pairs
     if len(practice_list) > 0:
+        show_instructions('Stimuli/Instructions/practice_instructions.txt')
         block(practice_list, trail_event_list, 0, config_dict, tracker, monitor)
     # When there are other "Block_Name" than TEST, get the number of block according to 
     # the NAME_SET
@@ -228,7 +272,11 @@ def experiment(assigned_item_data, trail_block_list, trail_event_list, config_di
             block_name = config_dict['NAME_SET'].split(' ')[i]
         else:
             block_name = 'TEST'
+        show_instructions('Stimuli/Instructions/block_instructions2.txt', block_name)
         block(trail_block_list[i - 1], trail_event_list, i, config_dict, tracker, monitor)
+        if i < num_blocks:
+            show_instructions('Stimuli/Instructions/block_break.txt')
+
 
 def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, monitor):
 
