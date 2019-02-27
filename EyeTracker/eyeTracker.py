@@ -18,6 +18,7 @@ FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
+INSTRUCTION = True
 INSTRUCTION_TEXT_HEIGHT = 0.1
 INSTRUCTION_FONT = 'Arial'
 INSTRUCTION_TEXT_COLOR = 'white'
@@ -90,12 +91,12 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         core.wait(5)
         #core.wait(audio.getDuration())
         audio.stop()
-        print(key_list)
-        key_press = event.waitKeys(keyList=key_list,maxWait=TIME_OUT)
-        tracker.sendMessage("Response")
-        tracker.sendMessage("!V TRIAL_VAR Response %s" %( key_press))
-        tracker.sendMessage("!V TRIAL_VAR Audio %s" %(currentAudio))
-        print(key_press)
+        if key_press is not None:
+            key_press = event.waitKeys(keyList=key_list,maxWait=TIME_OUT)
+            tracker.sendMessage("Response")
+            tracker.sendMessage("!V TRIAL_VAR Response %s" %( key_press))
+            tracker.sendMessage("!V TRIAL_VAR Audio %s" %(currentAudio))
+            print(key_press)
     else:
         core.wait(duration)
 
@@ -256,11 +257,13 @@ def prepare_pairs(item_data, config_dict):
 def experiment(assigned_item_data, trail_block_list, trail_event_list, config_dict, practice_list, tracker, monitor):
     
     num_blocks = int(config_dict['BLOCKS'])
-    show_instructions('Stimuli/Instructions/main_instructions.txt')
+    if INSTRUCTION:
+        show_instructions('Stimuli/Instructions/main_instructions.txt')
     name_flag = False
     # When there are PRACTICE pairs
     if len(practice_list) > 0:
-        show_instructions('Stimuli/Instructions/practice_instructions.txt')
+        if INSTRUCTION:
+            show_instructions('Stimuli/Instructions/practice_instructions.txt')
         block(practice_list, trail_event_list, 0, config_dict, tracker, monitor)
     # When there are other "Block_Name" than TEST, get the number of block according to 
     # the NAME_SET
@@ -272,10 +275,12 @@ def experiment(assigned_item_data, trail_block_list, trail_event_list, config_di
             block_name = config_dict['NAME_SET'].split(' ')[i]
         else:
             block_name = 'TEST'
-        show_instructions('Stimuli/Instructions/block_instructions2.txt', block_name)
+        if INSTRUCTION:
+            show_instructions('Stimuli/Instructions/block_instructions2.txt', block_name)
         block(trail_block_list[i - 1], trail_event_list, i, config_dict, tracker, monitor)
         if i < num_blocks:
-            show_instructions('Stimuli/Instructions/block_break.txt')
+            if INSTRUCTION:
+                show_instructions('Stimuli/Instructions/block_break.txt')
 
 
 def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, monitor):
@@ -422,7 +427,7 @@ def prepare(config_dict, condition_dict):
     """
     This fuction prepare the globle varibles from information in cofig.csv and conditions.csv
     """
-    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS
+    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS, INSTRUCTION
     file = os.path.basename(__file__)
     # get the expriment name
     EXPNAME = os.path.splitext(file)[0]
@@ -439,6 +444,7 @@ def prepare(config_dict, condition_dict):
     FILE_NAME = str(SUBJECTID)+ '.edf'
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
     RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
+    INSTRUCTION = (config_dict['INSTRUCTION'] == 'TRUE')
 
 if __name__=="__main__":
     # load the data files
