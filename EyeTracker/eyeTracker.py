@@ -91,7 +91,7 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         core.wait(5)
         #core.wait(audio.getDuration())
         audio.stop()
-        if key_press is not None:
+        if key_list is not None:
             key_press = event.waitKeys(keyList=key_list,maxWait=TIME_OUT)
             tracker.sendMessage("Response")
             tracker.sendMessage("!V TRIAL_VAR Response %s" %( key_press))
@@ -307,13 +307,13 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
         #Optional - start realtime mode
         pylink.beginRealTimeMode(100)
         
-        # # do driftcheck
-        # try:
-            # error = tracker.doDriftCorrect(win.size()[0]/2,win.size()[1],1,1)
-            # if error == 27: 
-                # tracker.doTrackerSetup()
-        # except:
-            # tracker.doTrackerSetup()
+        # do driftcheck
+        try:
+            error = tracker.doDriftCorrect(win.size()[0]/2,win.size()[1],1,1)
+            if error == 27: 
+                tracker.doTrackerSetup()
+        except:
+            tracker.doTrackerSetup()
             
         # start recording
         tracker.startRecording(1, 1, 1, 1)
