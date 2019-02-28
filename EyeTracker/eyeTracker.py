@@ -23,6 +23,8 @@ INSTRUCTION_TEXT_HEIGHT = 0.1
 INSTRUCTION_FONT = 'Arial'
 INSTRUCTION_TEXT_COLOR = 'white'
 
+cur_index = 0
+
 
 def display_instruction_words(instruction_text):
     """
@@ -288,10 +290,14 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
     num_trails = len(item_data_frame)
     num_events = len(trail_event_list)
     key = config_dict['KEY']
+    global cur_index
 
     for i in range(num_trails):
         # log trial onset message
-        tracker.sendMessage("TRIALID 0 %d" % i)
+        cur_index = cur_index + 1
+        print(cur_index)
+        print(i)
+        tracker.sendMessage("TRIALID 0 %d" % cur_index)
 
 
         #agc = surfToList(bgbm)
