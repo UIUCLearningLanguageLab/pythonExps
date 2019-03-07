@@ -3,7 +3,11 @@ prefs.general['audioLib'] = ['pygame']
 from psychopy import sound
 import pandas as pd
 import collections, pylink, os, numpy, csv, random
-from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy 
+from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy
+"""
+import imageio
+imageio.plugins.ffmpeg.download()
+"""
 
 """
 global variables
@@ -67,6 +71,17 @@ def display_event(event_text, duration, key_list, tracker, monitor):
             
             tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])- int((win.size[1]/2*0.8)/2),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]) + int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])+ int((win.size[1]/2*0.8)/2), pictures[i] ))
             tracker.sendMessage("!V TRIAL_VAR Picture%d %s" %(i, str(pictures[i])))
+    elif'.avi' in event_text or '.mp4' in event_text:
+        n = 1
+        i = 0
+        mov = visual.MovieStim3(win, 'Stimuli/Video/' + event_text, noAudio=False)
+        tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Video/%s %d %d %d %d" %(event_text, (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1]), int(win.size[0]/2*0.8), int(win.size[1]/2*0.8) ))
+            
+        tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])- int((win.size[1]/2*0.8)/2),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]) + int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])+ int((win.size[1]/2*0.8)/2), event_text ))
+        tracker.sendMessage("!V TRIAL_VAR Video%d %s" %(i, str(event_text)))
+        while mov.status != visual.FINISHED:
+            mov.draw()
+            win.flip()
     else:
         texts = event_text.split(' ')
         n = len(texts)
@@ -88,10 +103,12 @@ def display_event(event_text, duration, key_list, tracker, monitor):
     if len(event_text.split(' ')) > 1:
         currentAudio = 'Stimuli/Audio/' + event_text.split(' ')[-1]
         audio = sound.Sound(currentAudio)
+        print(event_text.split(' ')[-1])
+        print(audio.getDuration())
         audio.play()
         tracker.sendMessage("AudioOnset")
-        core.wait(5)
-        #core.wait(audio.getDuration())
+        #core.wait(5)
+        core.wait(audio.getDuration())
         audio.stop()
         if key_list is not None:
             key_press = event.waitKeys(keyList=key_list,maxWait=TIME_OUT)
@@ -99,9 +116,8 @@ def display_event(event_text, duration, key_list, tracker, monitor):
             tracker.sendMessage("!V TRIAL_VAR Response %s" %( key_press))
             tracker.sendMessage("!V TRIAL_VAR Audio %s" %(currentAudio))
             print(key_press)
-    else:
-        core.wait(duration)
-
+        else:
+            core.wait(duration) 
             
 # def surfToList(surf):
 # 	w=surf.get_width()
