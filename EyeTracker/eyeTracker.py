@@ -64,24 +64,23 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         n = len(pictures)-1
         pic = {}
         for i in range(n):
-            pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], size = [0.8, 0.8], pos = pos[n][i+1])
+            pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], pos = pos[n][i+1])
             pic[i].draw()
-
-            tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1]), int(win.size[0]/2*0.8), int(win.size[1]/2*0.8) ))
+            tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1]), int(win.size[0]/2*pic[i].size[0]), int(win.size[1]/2*pic[i].size[1]) ))
             
-            tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])- int((win.size[1]/2*0.8)/2),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]) + int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])+ int((win.size[1]/2*0.8)/2), pictures[i] ))
+            tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/2*pic[i].size[0])/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])- int((win.size[1]/2*pic[i].size[1])/2),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]) + int((win.size[0]/2*pic[i].size[0])/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])+ int((win.size[1]/2*pic[i].size[1])/2), pictures[i] ))
             tracker.sendMessage("!V TRIAL_VAR Picture%d %s" %(i, str(pictures[i])))
     elif'.avi' in event_text or '.mp4' in event_text:
         n = 1
         i = 0
         mov = visual.MovieStim3(win, 'Stimuli/Video/' + event_text, noAudio=False)
+        while mov.status != visual.FINISHED:
+            mov.draw()
+            win.flip()
         tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Video/%s %d %d %d %d" %(event_text, (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1]), int(win.size[0]/2*0.8), int(win.size[1]/2*0.8) ))
             
         tracker.sendMessage("!V IAREA RECTANGLE %d %d %d %d %d %s" %(int(i), (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0])-int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])- int((win.size[1]/2*0.8)/2),(win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]) + int((win.size[0]/2*0.8)/2), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1])+ int((win.size[1]/2*0.8)/2), event_text ))
         tracker.sendMessage("!V TRIAL_VAR Video%d %s" %(i, str(event_text)))
-        while mov.status != visual.FINISHED:
-            mov.draw()
-            win.flip()
     else:
         texts = event_text.split(' ')
         n = len(texts)
@@ -336,76 +335,7 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
         #         tracker.doTrackerSetup()
         # except:
         #     tracker.doTrackerSetup()
-
-        Hold = True
-        first = True
-        TimeoutDuration = 4.000  # timeout until recalibration
-        fixduration = 0.500  # time to trigger fixation
-        fixationWindow = [860, 440, 1060, 640]  # boundaries of fixation window [top, left, bottom, right]
-
-        while Hold:
-            # call calibration if fixation fails
-            if first != True:
-                win.flip()
-                tracker.stopRecording()
-                pylink.pumpDelay(50)
-                tk.setOfflineMode()
-                pylink.pumpDelay(50)
-                tk.doTrackerSetup()
-            else:
-                first = False
-
-            Hold = True  # variable for looping
-            start = 0  # start of duration timeout counter
-            FixStart = 0  # start of duration for fixation counter
-            dt = None  # stores gaze sample
-            gazePos = None  # stores gaze position [x,y]
-
-            # start recording
-            tk.setOfflineMode()
-            pylink.pumpDelay(50)
-            error = tk.startRecording(1, 1, 1, 1)
-            pylink.pumpDelay(100)  # wait for 100 ms to make sure data of interest is recorded
-
-            # determine which eye(s) are available
-            eyeTracked = tk.eyeAvailable()
-            if eyeTracked == 2: eyeTracked = 1
-
-            # log time starting loop
-            start = core.getAbsTime()
-
-            # draw a fixation point
-            fixation = visual.GratingStim(win, tex=None, mask='gauss', sf=0, size=0.05, name='fixation', autoLog=False)
-            fixation.draw()
-            win.flip()
-
-            # loop until timeut duration  exceeded
-            timer = core.CountdownTimer(TimeoutDuration)
-            while timer.getTime() > 0:
-                # get latest gaze sample
-                dt = tk.getNewestSample()
-
-                # check is sample is not empty
-                if (dt != None):
-                    # pick get correct gaze coords from recorded eye
-                    if eyeTracked == 1 and dt.isRightSample():
-                        gazePos = dt.getRightEye().getGaze()
-                    elif eyeTracked == 0 and dt.isLeftSample():
-                        gazePos = dt.getLeftEye().getGaze()
-
-                    # check if gaze coords is in window
-                    if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > \
-                            fixationWindow[1] and gazePos[1] < fixationWindow[3]:
-
-                        if FixStart == 0:  # update start time if start is 0
-                            FixStart = core.CountdownTimer(fixduration)
-                        elif timer.getTime() <= 0:  # break loop if fixation duration is exceeded
-                            Hold = False
-                            break
-                    else:
-                        FixStart = 0  # reset fixation counter
-                else:
-                    FixStart = 0  # reset fixation counter
+              
             
         # start recording
         tracker.startRecording(1, 1, 1, 1)
@@ -433,6 +363,76 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
                     display_event(event_text, duration, None,tracker,monitor)
 
         win.flip()
+        if i != num_trails-1:
+            Hold = True
+            first = True
+            TimeoutDuration = 1.000  # timeout until recalibration
+            fixduration = 0.500  # time to trigger fixation
+            fixationWindow = [860, 440, 1060, 640]  # boundaries of fixation window [top, left, bottom, right]
+            while Hold:
+                # call calibration if fixation fails
+                if first != True:
+                    win.flip()
+                    tracker.stopRecording()
+                    pylink.pumpDelay(50)
+                    tk.setOfflineMode()
+                    pylink.pumpDelay(50)
+                    tk.doTrackerSetup()
+                else:
+                    first = False
+
+                Hold = True  # variable for looping
+                start = 0  # start of duration timeout counter
+                FixStart = 0  # start of duration for fixation counter
+                dt = None  # stores gaze sample
+                gazePos = None  # stores gaze position [x,y]
+
+                # start recording
+                tk.setOfflineMode()
+                pylink.pumpDelay(50)
+                error = tk.startRecording(1, 1, 1, 1)
+                pylink.pumpDelay(100)  # wait for 100 ms to make sure data of interest is recorded
+
+                # determine which eye(s) are available
+                eyeTracked = tk.eyeAvailable()
+                if eyeTracked == 2: eyeTracked = 1
+
+                # log time starting loop
+                start = core.getAbsTime()
+
+                # draw a fixation point
+                #fixation = visual.GratingStim(win, tex=None, mask='gauss', sf=0, size=0.05, name='fixation', autoLog=False)
+                fixation = visual.MovieStim3(win, 'Stimuli/Video/AttenGetter.mp4', noAudio=False)
+                fixation.draw()
+                win.flip()
+
+                # loop until timeut duration  exceeded
+                timer = core.CountdownTimer(TimeoutDuration)
+                while timer.getTime() > 0:
+                    # get latest gaze sample
+                    dt = tk.getNewestSample()
+
+                    # check is sample is not empty
+                    if (dt != None):
+                        # pick get correct gaze coords from recorded eye
+                        if eyeTracked == 1 and dt.isRightSample():
+                            gazePos = dt.getRightEye().getGaze()
+                        elif eyeTracked == 0 and dt.isLeftSample():
+                            gazePos = dt.getLeftEye().getGaze()
+
+                        # check if gaze coords is in window
+                        if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > \
+                                fixationWindow[1] and gazePos[1] < fixationWindow[3]:
+
+                            if FixStart == 0:  # update start time if start is 0
+                                FixStart = core.CountdownTimer(fixduration)
+                            elif timer.getTime() <= 0:  # break loop if fixation duration is exceeded
+                                Hold = False
+                                break
+                        else:
+                            FixStart = 0  # reset fixation counter
+                    else:
+                        FixStart = 0  # reset fixation counter
     
         # disable realtime mode
         pylink.endRealTimeMode()
