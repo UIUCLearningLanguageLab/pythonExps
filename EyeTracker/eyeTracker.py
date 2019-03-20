@@ -102,8 +102,6 @@ def display_event(event_text, duration, key_list, tracker, monitor):
     if len(event_text.split(' ')) > 1:
         currentAudio = 'Stimuli/Audio/' + event_text.split(' ')[-1]
         audio = sound.Sound(currentAudio)
-        print(event_text.split(' ')[-1])
-        print(audio.getDuration())
         audio.play()
         tracker.sendMessage("AudioOnset")
         #core.wait(5)
@@ -310,8 +308,6 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
     for i in range(num_trails):
         # log trial onset message
         cur_index = cur_index + 1
-        print(cur_index)
-        print(i)
         tracker.sendMessage("TRIALID 0 %d" % cur_index)
 
 
@@ -365,23 +361,8 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
         win.flip()
         if i != num_trails-1:
             Hold = True
-            first = True
-            TimeoutDuration = 1.000  # timeout until recalibration
-            fixduration = 0.500  # time to trigger fixation
-            fixationWindow = [860, 440, 1060, 640]  # boundaries of fixation window [top, left, bottom, right]
+            fixationWindow = [300, 300, 900, 900]  # boundaries of fixation window [top, left, bottom, right]
             while Hold:
-                # call calibration if fixation fails
-                if first != True:
-                    win.flip()
-                    tracker.stopRecording()
-                    pylink.pumpDelay(50)
-                    tk.setOfflineMode()
-                    pylink.pumpDelay(50)
-                    tk.doTrackerSetup()
-                else:
-                    first = False
-
-                Hold = True  # variable for looping
                 start = 0  # start of duration timeout counter
                 FixStart = 0  # start of duration for fixation counter
                 dt = None  # stores gaze sample
@@ -397,19 +378,13 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
                 eyeTracked = tk.eyeAvailable()
                 if eyeTracked == 2: eyeTracked = 1
 
-                # log time starting loop
-                start = core.getAbsTime()
-
                 # draw a fixation point
                 #fixation = visual.GratingStim(win, tex=None, mask='gauss', sf=0, size=0.05, name='fixation', autoLog=False)
                 fixation = visual.MovieStim3(win, 'Stimuli/Video/AttenGetter.mp4', noAudio=False)
-                fixation.draw()
-                win.flip()
+                while fixation.status != visual.FINISHED:
+                    fixation.draw()
+                    win.flip()
 
-                # loop until timeut duration  exceeded
-                timer = core.CountdownTimer(TimeoutDuration)
-                while timer.getTime() > 0:
-                    # get latest gaze sample
                     dt = tk.getNewestSample()
 
                     # check is sample is not empty
@@ -421,18 +396,13 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
                             gazePos = dt.getLeftEye().getGaze()
 
                         # check if gaze coords is in window
-                        if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > \
-                                fixationWindow[1] and gazePos[1] < fixationWindow[3]:
-
-                            if FixStart == 0:  # update start time if start is 0
-                                FixStart = core.CountdownTimer(fixduration)
-                            elif timer.getTime() <= 0:  # break loop if fixation duration is exceeded
-                                Hold = False
-                                break
-                        else:
-                            FixStart = 0  # reset fixation counter
-                    else:
-                        FixStart = 0  # reset fixation counter
+                        print(gazePos[0])
+                        print(gazePos[1])
+                        if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > fixationWindow[1] and gazePos[1] < fixationWindow[3]:
+                            fixation.pause()
+                            Hold = False
+                            fixation.status = visual.FINISHED
+                fixation.stop()
     
         # disable realtime mode
         pylink.endRealTimeMode()
