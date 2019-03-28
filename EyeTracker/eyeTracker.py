@@ -25,7 +25,7 @@ RAND_WITHIN_BLOCKS = True
 INSTRUCTION = True
 INSTRUCTION_TEXT_HEIGHT = 0.1
 INSTRUCTION_FONT = 'Arial'
-INSTRUCTION_TEXT_COLOR = 'white'
+INSTRUCTION_TEXT_COLOR = 'pink'
 
 cur_index = 0
 
@@ -381,27 +381,32 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
                 # draw a fixation point
                 #fixation = visual.GratingStim(win, tex=None, mask='gauss', sf=0, size=0.05, name='fixation', autoLog=False)
                 fixation = visual.MovieStim3(win, 'Stimuli/Video/AttenGetter.mp4', noAudio=False)
-                while fixation.status != visual.FINISHED:
-                    fixation.draw()
-                    win.flip()
+                timer = core.CountdownTimer(2)
+                while timer.getTime() >= 0:
+                    while fixation.status != visual.FINISHED:
+                        fixation.draw()
+                        win.flip()
 
-                    dt = tk.getNewestSample()
+                        dt = tk.getNewestSample()
 
-                    # check is sample is not empty
-                    if (dt != None):
-                        # pick get correct gaze coords from recorded eye
-                        if eyeTracked == 1 and dt.isRightSample():
-                            gazePos = dt.getRightEye().getGaze()
-                        elif eyeTracked == 0 and dt.isLeftSample():
-                            gazePos = dt.getLeftEye().getGaze()
+                        # check is sample is not empty
+                        if (dt != None):
+                            # pick get correct gaze coords from recorded eye
+                            if eyeTracked == 1 and dt.isRightSample():
+                                gazePos = dt.getRightEye().getGaze()
+                            elif eyeTracked == 0 and dt.isLeftSample():
+                                gazePos = dt.getLeftEye().getGaze()
 
-                        # check if gaze coords is in window
-                        print(gazePos[0])
-                        print(gazePos[1])
-                        if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > fixationWindow[1] and gazePos[1] < fixationWindow[3]:
-                            fixation.pause()
-                            Hold = False
-                            fixation.status = visual.FINISHED
+                            # check if gaze coords is in window
+                            if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > fixationWindow[1] and gazePos[1] < fixationWindow[3]:
+                                if timer.getTime() <= 0:
+                                    fixation.pause()
+                                    Hold = False
+                                    fixation.status = visual.FINISHED
+                                else:
+                                    continue
+                            else:
+                                timer = core.CountdownTimer(2)
                 fixation.stop()
     
         # disable realtime mode
@@ -503,7 +508,8 @@ def prepare(config_dict, condition_dict):
     # randomly generate a subject id
     SUBJECTID = random.randint(10 ** 5, 10 ** 6)
     # generate the file name for output
-    FILE_NAME = str(SUBJECTID)+ '.edf'
+    username = raw_input('Enter username:')
+    FILE_NAME = username + '.edf'
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
     RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
     INSTRUCTION = (config_dict['INSTRUCTION'] == 'TRUE')
@@ -529,7 +535,7 @@ if __name__=="__main__":
     # set monitor
     mon = monitors.Monitor('myMon', width=33.7, distance=60.0)
     # define window
-    win = visual.Window(size = (1000,600), color = (-1,-1,-1), monitor=mon, fullscr = True )
+    win = visual.Window(size = (1000,600), color = (255,255,255), monitor=mon, fullscr = True )
 
     #set monitor pixel dimensions
     mon.setSizePix((win.size[0], win.size[1]))
