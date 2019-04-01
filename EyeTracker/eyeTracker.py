@@ -21,6 +21,7 @@ CONDITION = ''
 FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
+RAND_PICTURE = True
 
 INSTRUCTION = True
 INSTRUCTION_TEXT_HEIGHT = 0.1
@@ -28,7 +29,7 @@ INSTRUCTION_FONT = 'Arial'
 INSTRUCTION_TEXT_COLOR = 'pink'
 
 cur_index = 0
-
+fixations = []
 
 def display_instruction_words(instruction_text):
     """
@@ -63,6 +64,8 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         pictures = event_text.split(' ')
         n = len(pictures)-1
         pic = {}
+        if RAND_PICTURE == True:
+            random.shuffle(pictures)
         for i in range(n):
             pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], pos = pos[n][i+1])
             pic[i].draw()
@@ -85,6 +88,8 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         texts = event_text.split(' ')
         n = len(texts)
         words = {}
+        if RAND_PICTURE == True:
+            random.shuffle(texts)
         for i in range(n):
             words[i] = visual.TextStim(win, text=texts[i],
                                 height=0.8,
@@ -296,7 +301,77 @@ def experiment(assigned_item_data, trail_block_list, trail_event_list, config_di
         if i < num_blocks:
             if INSTRUCTION:
                 show_instructions('Stimuli/Instructions/block_break.txt')
+def attention_getter(display_item, tk):
+    Hold = True
+    fixationWindow = [300, 300, 900, 900]  # boundaries of fixation window [top, left, bottom, right]
+    while Hold:
+        start = 0  # start of duration timeout counter
+        FixStart = 0  # start of duration for fixation counter
+        dt = None  # stores gaze sample
+        gazePos = None  # stores gaze position [x,y]
 
+        # start recording
+        tk.setOfflineMode()
+        pylink.pumpDelay(50)
+        error = tk.startRecording(1, 1, 1, 1)
+        pylink.pumpDelay(100)  # wait for 100 ms to make sure data of interest is recorded
+
+        # determine which eye(s) are available
+        eyeTracked = tk.eyeAvailable()
+        if eyeTracked == 2: eyeTracked = 1
+
+        # draw a fixation point
+        #fixation = visual.GratingStim(win, tex=None, mask='gauss', sf=0, size=0.05, name='fixation', autoLog=False)
+        if '.mp4' in display_item or '.avi' in display_item:
+            fixation = visual.MovieStim3(win, 'Stimuli/Video/'+display_item, noAudio=False)
+        elif '.jpg' in display_item or '.jpeg' in display_item:
+            fixation = visual.ImageStim(win, image = 'Stimuli/Images/'+display_item)
+        else:
+            fixation = visual.TextStim(win, text=display_item,
+                                height=0.8,
+                                color='pink',
+                                bold=False,
+                                italic=False)
+        timer = core.CountdownTimer(FIXATION_TIME)
+        while timer.getTime() >= 0:
+            force_continue = false
+            while fixation.status != visual.FINISHED:
+
+                fixation.draw()
+                win.flip()
+
+                # press space to continue
+                cur_key = event.getKeys(['space'])
+                if cur_key != None:
+                    fixation.pause()
+                    Hold = False
+                    force_continue = True
+                    fixation.status = visual.FINISHED
+                    break
+                
+                dt = tk.getNewestSample()
+
+                # check is sample is not empty
+                if (dt != None):
+                    # pick get correct gaze coords from recorded eye
+                    if eyeTracked == 1 and dt.isRightSample():
+                        gazePos = dt.getRightEye().getGaze()
+                    elif eyeTracked == 0 and dt.isLeftSample():
+                        gazePos = dt.getLeftEye().getGaze()
+
+                    # check if gaze coords is in window
+                    if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > fixationWindow[1] and gazePos[1] < fixationWindow[3]:
+                        if timer.getTime() <= 0:
+                            fixation.pause()
+                            Hold = False
+                            fixation.status = visual.FINISHED
+                        else:
+                            continue
+                    else:
+                        timer = core.CountdownTimer(FIXATION_TIME)
+            if force_continue == True:
+                break
+        fixation.stop()
 
 def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, monitor):
 
@@ -360,54 +435,8 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
 
         win.flip()
         if i != num_trails-1:
-            Hold = True
-            fixationWindow = [300, 300, 900, 900]  # boundaries of fixation window [top, left, bottom, right]
-            while Hold:
-                start = 0  # start of duration timeout counter
-                FixStart = 0  # start of duration for fixation counter
-                dt = None  # stores gaze sample
-                gazePos = None  # stores gaze position [x,y]
-
-                # start recording
-                tk.setOfflineMode()
-                pylink.pumpDelay(50)
-                error = tk.startRecording(1, 1, 1, 1)
-                pylink.pumpDelay(100)  # wait for 100 ms to make sure data of interest is recorded
-
-                # determine which eye(s) are available
-                eyeTracked = tk.eyeAvailable()
-                if eyeTracked == 2: eyeTracked = 1
-
-                # draw a fixation point
-                #fixation = visual.GratingStim(win, tex=None, mask='gauss', sf=0, size=0.05, name='fixation', autoLog=False)
-                fixation = visual.MovieStim3(win, 'Stimuli/Video/AttenGetter.mp4', noAudio=False)
-                timer = core.CountdownTimer(2)
-                while timer.getTime() >= 0:
-                    while fixation.status != visual.FINISHED:
-                        fixation.draw()
-                        win.flip()
-
-                        dt = tk.getNewestSample()
-
-                        # check is sample is not empty
-                        if (dt != None):
-                            # pick get correct gaze coords from recorded eye
-                            if eyeTracked == 1 and dt.isRightSample():
-                                gazePos = dt.getRightEye().getGaze()
-                            elif eyeTracked == 0 and dt.isLeftSample():
-                                gazePos = dt.getLeftEye().getGaze()
-
-                            # check if gaze coords is in window
-                            if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > fixationWindow[1] and gazePos[1] < fixationWindow[3]:
-                                if timer.getTime() <= 0:
-                                    fixation.pause()
-                                    Hold = False
-                                    fixation.status = visual.FINISHED
-                                else:
-                                    continue
-                            else:
-                                timer = core.CountdownTimer(2)
-                fixation.stop()
+            fixation_item = str(fixations[random.randint(0, len(fixations) - 1)])
+            attention_getter(fixation_item, tk)
     
         # disable realtime mode
         pylink.endRealTimeMode()
@@ -494,12 +523,14 @@ def prepare(config_dict, condition_dict):
     """
     This fuction prepare the globle varibles from information in cofig.csv and conditions.csv
     """
-    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS, INSTRUCTION
+    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS, INSTRUCTION, fixations
     file = os.path.basename(__file__)
     # get the expriment name
     EXPNAME = os.path.splitext(file)[0]
     TIME_OUT = float(config_dict['TIMEOUT']) / 1000
+    FIXATION_TIME = float(confic_dict['FIXATION_TIME'])
     items = condition_dict['items'].split(' ')
+    fixations = config_dict['fixation_list'].split(' ')
     # get the item list in random
     ITEM_LIST = str(items[random.randint(0, len(items) - 1)])
     conditions = condition_dict['trail_events'].split(' ')
@@ -512,6 +543,7 @@ def prepare(config_dict, condition_dict):
     FILE_NAME = username + '.edf'
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
     RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
+    RAND_PICTURE = (config_dict['RAND_PICTURE'] == 'TRUE')
     INSTRUCTION = (config_dict['INSTRUCTION'] == 'TRUE')
 
 if __name__=="__main__":
