@@ -12,6 +12,7 @@ imageio.plugins.ffmpeg.download()
 """
 global variables
 """
+FIXATION_TIME = 1
 TIME_OUT = 1000
 FILE_NAME = ''
 EXPNAME = ''
@@ -62,7 +63,11 @@ def display_event(event_text, duration, key_list, tracker, monitor):
     if '.jpg' in event_text or '.jpeg' in event_text:
         
         pictures = event_text.split(' ')
-        n = len(pictures)-1
+        if '.wav' in event_text:
+            n = len(pictures)-1
+            pictures = pictures[:-1]
+        else:
+            n = len(pictures)
         pic = {}
         if RAND_PICTURE == True:
             random.shuffle(pictures)
@@ -86,7 +91,11 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         tracker.sendMessage("!V TRIAL_VAR Video%d %s" %(i, str(event_text)))
     else:
         texts = event_text.split(' ')
-        n = len(texts)
+        if '.wav' in event_text:
+            n = len(texts)-1
+            texts = texts[:-1]
+        else:
+            n = len(texts)
         words = {}
         if RAND_PICTURE == True:
             random.shuffle(texts)
@@ -334,19 +343,20 @@ def attention_getter(display_item, tk):
                                 italic=False)
         timer = core.CountdownTimer(FIXATION_TIME)
         while timer.getTime() >= 0:
-            force_continue = false
+            force_continue = False
             while fixation.status != visual.FINISHED:
 
                 fixation.draw()
                 win.flip()
-
+                
                 # press space to continue
                 cur_key = event.getKeys(['space'])
-                if cur_key != None:
-                    fixation.pause()
+                if cur_key != []:
+                    if '.mp4' in display_item or '.avi' in display_item:
+                        fixation.pause()
+                        fixation.status = visual.FINISHED
                     Hold = False
                     force_continue = True
-                    fixation.status = visual.FINISHED
                     break
                 
                 dt = tk.getNewestSample()
@@ -362,7 +372,8 @@ def attention_getter(display_item, tk):
                     # check if gaze coords is in window
                     if gazePos[0] > fixationWindow[0] and gazePos[0] < fixationWindow[2] and gazePos[1] > fixationWindow[1] and gazePos[1] < fixationWindow[3]:
                         if timer.getTime() <= 0:
-                            fixation.pause()
+                            if '.mp4' in display_item or '.avi' in display_item:
+                                fixation.pause()
                             Hold = False
                             fixation.status = visual.FINISHED
                         else:
@@ -371,7 +382,8 @@ def attention_getter(display_item, tk):
                         timer = core.CountdownTimer(FIXATION_TIME)
             if force_continue == True:
                 break
-        fixation.stop()
+        if '.mp4' in display_item or '.avi' in display_item:
+            fixation.stop()
 
 def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, monitor):
 
@@ -528,9 +540,9 @@ def prepare(config_dict, condition_dict):
     # get the expriment name
     EXPNAME = os.path.splitext(file)[0]
     TIME_OUT = float(config_dict['TIMEOUT']) / 1000
-    FIXATION_TIME = float(confic_dict['FIXATION_TIME'])
+    FIXATION_TIME = float(config_dict['FIXATION_TIME'])
     items = condition_dict['items'].split(' ')
-    fixations = config_dict['fixation_list'].split(' ')
+    fixations = condition_dict['fixation_list'].split(' ')
     # get the item list in random
     ITEM_LIST = str(items[random.randint(0, len(items) - 1)])
     conditions = condition_dict['trail_events'].split(' ')
