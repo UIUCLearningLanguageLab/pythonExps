@@ -2,7 +2,7 @@ from psychopy import visual, core, event, monitors, tools, prefs
 prefs.general['audioLib'] = ['pygame']
 from psychopy import sound
 import pandas as pd
-import collections, pylink, os, numpy, csv, random
+import collections, pylink, os, numpy, csv, random, time, datetime
 from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy
 """
 import imageio
@@ -15,6 +15,7 @@ global variables
 FIXATION_TIME = 1
 TIME_OUT = 1000
 FILE_NAME = ''
+CSV_FILENAME = ''
 EXPNAME = ''
 SUBJECTID = ''
 ITEM_LIST = ''
@@ -23,6 +24,7 @@ FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 RAND_PICTURE = True
+NEW_FILE = True
 
 INSTRUCTION = True
 INSTRUCTION_TEXT_HEIGHT = 0.1
@@ -48,7 +50,8 @@ def display_instruction_words(instruction_text):
     key_press = event.waitKeys(keyList=['space'])
 
 
-def display_event(event_text, duration, key_list, tracker, monitor):
+def display_event(event_text, duration, key_list, block_name, tracker, monitor):
+    global NEW_FILE, CSV_FILENAME
     tracker.sendMessage("!V CLEAR 0 0 0 ")
 
     pos = collections.defaultdict(dict)
@@ -60,6 +63,7 @@ def display_event(event_text, duration, key_list, tracker, monitor):
     pos[4][3] = (-0.5, -0.5)
     pos[4][4] = (0.5, -0.5)
 
+    row = []
     if '.jpg' in event_text or '.jpeg' in event_text:
         
         pictures = event_text.split(' ')
@@ -72,6 +76,7 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         if RAND_PICTURE == True:
             random.shuffle(pictures)
         for i in range(n):
+            row.extend(pictures[i])
             pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], pos = pos[n][i+1])
             pic[i].draw()
             tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1]), int(win.size[0]/2*pic[i].size[0]), int(win.size[1]/2*pic[i].size[1]) ))
@@ -100,6 +105,7 @@ def display_event(event_text, duration, key_list, tracker, monitor):
         if RAND_PICTURE == True:
             random.shuffle(texts)
         for i in range(n):
+            row.extend(texts[i])
             words[i] = visual.TextStim(win, text=texts[i],
                                 height=0.8,
                                 pos=pos[n][i+1],
@@ -113,8 +119,9 @@ def display_event(event_text, duration, key_list, tracker, monitor):
     win.flip()
     tracker.sendMessage("DisplayOnset_%s" %(event_text))
     
-    if len(event_text.split(' ')) > 1:
+    if '.wav' in event_text.split(' '):
         currentAudio = 'Stimuli/Audio/' + event_text.split(' ')[-1]
+        row.extend(event_text.split(' ')[-1])
         audio = sound.Sound(currentAudio)
         audio.play()
         tracker.sendMessage("AudioOnset")
@@ -129,6 +136,14 @@ def display_event(event_text, duration, key_list, tracker, monitor):
             print(key_press)
         else:
             core.wait(duration) 
+        if NEW_FILE != True:
+            append_write = 'a' # append if already exists
+        else:
+            append_write = 'w' # make a new file if not
+            NEW_FILE = false
+        with open('Data/' + CSV_FILENAME, append_write) as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            filewriter.writerow(row)
             
 # def surfToList(surf):
 # 	w=surf.get_width()
@@ -441,9 +456,9 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
                 # need display the pairs
                 event_text = item_data_frame.loc[i, event_name]
                 if valid_key_list != '':
-                    display_event(event_text, duration, valid_key_list,tracker,monitor)
+                    display_event(event_text, duration, valid_key_list, block_num, tracker,monitor)
                 else:
-                    display_event(event_text, duration, None,tracker,monitor)
+                    display_event(event_text, duration, None, block_num, tracker,monitor)
 
         win.flip()
         if i != num_trails-1:
@@ -535,7 +550,7 @@ def prepare(config_dict, condition_dict):
     """
     This fuction prepare the globle varibles from information in cofig.csv and conditions.csv
     """
-    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS, INSTRUCTION, fixations
+    global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS, INSTRUCTION, fixations, CSV_FILENAME
     file = os.path.basename(__file__)
     # get the expriment name
     EXPNAME = os.path.splitext(file)[0]
@@ -552,7 +567,10 @@ def prepare(config_dict, condition_dict):
     SUBJECTID = random.randint(10 ** 5, 10 ** 6)
     # generate the file name for output
     username = raw_input('Enter username:')
+    cur_time = time.time();
+    str_time = datetime.datetime.fromtimestamp(cur_time).strftime('%Y-%m-%d %H:%M:%S')
     FILE_NAME = username + '.edf'
+    CSV_FILENAME = username + str_time + ITEM_LIST + '.csv'
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
     RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
     RAND_PICTURE = (config_dict['RAND_PICTURE'] == 'TRUE')
