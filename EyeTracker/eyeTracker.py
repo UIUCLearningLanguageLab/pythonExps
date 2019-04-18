@@ -64,6 +64,7 @@ def display_event(event_text, duration, key_list, block_name, tracker, monitor):
     pos[4][4] = (0.5, -0.5)
 
     row = []
+    row.append(block_name)
     if '.jpg' in event_text or '.jpeg' in event_text:
         
         pictures = event_text.split(' ')
@@ -76,7 +77,7 @@ def display_event(event_text, duration, key_list, block_name, tracker, monitor):
         if RAND_PICTURE == True:
             random.shuffle(pictures)
         for i in range(n):
-            row.extend(pictures[i])
+            row.append(pictures[i])
             pic[i] = visual.ImageStim(win, image = 'Stimuli/Images/'+ pictures[i], pos = pos[n][i+1])
             pic[i].draw()
             tracker.sendMessage("!V IMGLOAD CENTER ./Stimuli/Images/%s %d %d %d %d" %(pictures[i], (win.size[0]/2) + ((win.size[0]/2)*pos[n][i+1][0]), (win.size[1]/2)+((win.size[1]/2)*pos[n][i+1][1]), int(win.size[0]/2*pic[i].size[0]), int(win.size[1]/2*pic[i].size[1]) ))
@@ -105,7 +106,7 @@ def display_event(event_text, duration, key_list, block_name, tracker, monitor):
         if RAND_PICTURE == True:
             random.shuffle(texts)
         for i in range(n):
-            row.extend(texts[i])
+            row.append(texts[i])
             words[i] = visual.TextStim(win, text=texts[i],
                                 height=0.8,
                                 pos=pos[n][i+1],
@@ -119,9 +120,9 @@ def display_event(event_text, duration, key_list, block_name, tracker, monitor):
     win.flip()
     tracker.sendMessage("DisplayOnset_%s" %(event_text))
     
-    if '.wav' in event_text.split(' '):
+    if '.wav' in event_text:
         currentAudio = 'Stimuli/Audio/' + event_text.split(' ')[-1]
-        row.extend(event_text.split(' ')[-1])
+        row.append(event_text.split(' ')[-1])
         audio = sound.Sound(currentAudio)
         audio.play()
         tracker.sendMessage("AudioOnset")
@@ -140,9 +141,10 @@ def display_event(event_text, duration, key_list, block_name, tracker, monitor):
             append_write = 'a' # append if already exists
         else:
             append_write = 'w' # make a new file if not
-            NEW_FILE = false
+            NEW_FILE = False
         with open('Data/' + CSV_FILENAME, append_write) as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            print(row)
             filewriter.writerow(row)
             
 # def surfToList(surf):
@@ -246,7 +248,7 @@ def prepare_pairs(item_data, config_dict):
         count = 0; # count the number of practice pairs
         # Assign the block number
         for i in range(num_items):
-            if item_data.loc[i, "Block_Name"] == 'PRACTICE':
+            if str(item_data.loc[i, "Block_Name"]) == 'PRACTICE':
                 count += 1
                 block_list.append(0)
                 continue
@@ -282,15 +284,17 @@ def prepare_pairs(item_data, config_dict):
     # for situations with other than TEST
     else:
         for i in range(num_items):
-            block_name = item_data.loc[i, "Block_Name"]
+            block_name = str(item_data.loc[i, "Block_Name"])
             item_data.loc[i, "Block"] = name_set.index(block_name)
-
-        practice_list = item_data[item_data["Block_Name"] == 'PRACTICE']
-        practice_list = practice_list.reset_index()
+        if isinstance(item_data.loc[i, "Block_Name"], str):
+            practice_list = item_data[item_data["Block_Name"] == 'PRACTICE']
+            practice_list = practice_list.reset_index()
+        else:
+            practice_list = []
 
         trail_block_list = []
         # assign pairs to block according to their "Block_Name" value
-        for i in range(1, len(name_set)):
+        for i in range(1, len(name_set)+1):
             block_dataframe = item_data[item_data["Block"] == i]
             if RAND_WITHIN_BLOCKS == True:
                 block_dataframe = block_dataframe.sample(frac=1)
@@ -325,6 +329,8 @@ def experiment(assigned_item_data, trail_block_list, trail_event_list, config_di
         if i < num_blocks:
             if INSTRUCTION:
                 show_instructions('Stimuli/Instructions/block_break.txt')
+            fixation_item = str(fixations[random.randint(0, len(fixations) - 1)])
+            attention_getter(fixation_item, tracker)
 def attention_getter(display_item, tk):
     Hold = True
     fixationWindow = [300, 300, 900, 900]  # boundaries of fixation window [top, left, bottom, right]
@@ -461,9 +467,9 @@ def block(item_data_frame, trial_event_list, block_num, config_dict, tracker, mo
                     display_event(event_text, duration, None, block_num, tracker,monitor)
 
         win.flip()
-        if i != num_trails-1:
-            fixation_item = str(fixations[random.randint(0, len(fixations) - 1)])
-            attention_getter(fixation_item, tk)
+        #if i != num_trails-1:
+            #fixation_item = str(fixations[random.randint(0, len(fixations) - 1)])
+            #attention_getter(fixation_item, tracker)
     
         # disable realtime mode
         pylink.endRealTimeMode()
@@ -568,7 +574,7 @@ def prepare(config_dict, condition_dict):
     # generate the file name for output
     username = raw_input('Enter username:')
     cur_time = time.time();
-    str_time = datetime.datetime.fromtimestamp(cur_time).strftime('%Y-%m-%d %H:%M:%S')
+    str_time = datetime.datetime.fromtimestamp(cur_time).strftime('%Y_%m_%d_%H_%M_%S')
     FILE_NAME = username + '.edf'
     CSV_FILENAME = username + str_time + ITEM_LIST + '.csv'
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
