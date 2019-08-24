@@ -265,7 +265,6 @@ def prepare_pairs(item_data, config_dict):
         for i in range(num_items):
             block_name = item_data.loc[i, "Block_Name"]
             item_data.loc[i, "Block"] = name_set.index(block_name)
-
         practice_list = item_data[item_data["Block_Name"] == 'PRACTICE']
         practice_list = practice_list.reset_index()
 
@@ -275,7 +274,12 @@ def prepare_pairs(item_data, config_dict):
             block_dataframe = item_data[item_data["Block"] == i]
             if RAND_WITHIN_BLOCKS == True:
                 block_dataframe = block_dataframe.sample(frac=1)
+                practice_list = practice_list.sample(frac=1)
+
             trial_block_list.append(block_dataframe.reset_index())
+
+        practice_list = practice_list.reset_index()
+
         return item_data, trial_block_list, practice_list
 
 
@@ -407,7 +411,7 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
 
 def prepare(config_dict, condition_dict):
     """
-    This fuction prepare the globle varibles from information in cofig.csv and conditions.csv
+    This function prepare the global variables from information in config.csv and conditions.csv
     """
     global EXPNAME, TIME_OUT, ITEM_LIST, CONDITION, SUBJECTID, FILE_NAME, RAND_BLOCKS, RAND_WITHIN_BLOCKS
     file = os.path.basename(__file__)
