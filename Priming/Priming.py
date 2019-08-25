@@ -257,7 +257,10 @@ def prepare_pairs(item_data, config_dict):
             if RAND_WITHIN_BLOCKS == True:
                 # shuffle within the block
                 block_dataframe = block_dataframe.sample(frac=1)
+                practice_list = practice_list.sample(frac=1)
             trial_block_list.append(block_dataframe.reset_index())
+
+        practice_list = practice_list.reset_index()
 
         return item_data, trial_block_list, practice_list
     # for situations with other than TEST
@@ -333,7 +336,6 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
         block(trial_block_list[i - 1], trial_event_list, i, config_dict)
         if i < num_blocks:
             show_instructions('Stimuli/Instructions/block_break.txt')
-
 
 
 def block(item_data_frame, trial_event_list, block_num, config_dict):
