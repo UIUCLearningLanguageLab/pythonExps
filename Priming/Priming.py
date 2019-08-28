@@ -444,8 +444,6 @@ def main():
     prepare(config_dict, condition_dict)
     item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
     trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
-    print('ya')
-    print(ITEM_LIST)
     if verify_items_and_events(item_data, trial_event_list):
         assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
         experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list)
