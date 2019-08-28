@@ -340,7 +340,7 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
 
 def block(item_data_frame, trial_event_list, block_num, config_dict):
     """
-    This function excute each trial with all events in order.
+    This function executes each trial with all events in order.
     """
     num_trials = len(item_data_frame)
     num_events = len(trial_event_list)
@@ -429,7 +429,11 @@ def prepare(config_dict, condition_dict):
     # randomly generate a subject id
     SUBJECTID = random.randint(10 ** 5, 10 ** 6)
     # generate the file name for output
-    FILE_NAME = EXPNAME + '_' + str(SUBJECTID)
+    task_rp_list = ITEM_LIST.split('_')
+    task = task_rp_list[0]
+    rp = task_rp_list[1]
+    lst = task_rp_list[2]
+    FILE_NAME = EXPNAME + '_' + task + '_' + CONDITION + '_' + rp + '_' + lst + '_' + str(SUBJECTID)
     RAND_BLOCKS = (config_dict['RAND_BLOCKS'] == 'TRUE')
     RAND_WITHIN_BLOCKS = (config_dict['RAND_WITHIN_BLOCKS'] == 'TRUE')
 
@@ -440,6 +444,8 @@ def main():
     prepare(config_dict, condition_dict)
     item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
     trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
+    print('ya')
+    print(ITEM_LIST)
     if verify_items_and_events(item_data, trial_event_list):
         assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
         experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list)

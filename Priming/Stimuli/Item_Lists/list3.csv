@@ -1,9 +1,0 @@
-Fixation,Prime,Mask,Target,Block_Name,Relevant,Corr_response,Feedback
-+,dog,&&&,cat,PRACTICE,1,1,song.wav
-+,cat,&&&,shoe,PRACTICE,0,1,song.wav
-+,door,&&&,dog,PRACTICE,0,1,song.wav
-+,foot,&&&,shoe,PRACTICE,1,1,song.wav
-+,web,&&&,blog,PRACTICE,1,1,song.wav
-+,shirt,&&&,blicket,PRACTICE,0,2,song.wav
-+,wind,&&&,storm,PRACTICE,1,1,song.wav
-+,tree,&&&,fron,PRACTICE,0,2,song.wav
