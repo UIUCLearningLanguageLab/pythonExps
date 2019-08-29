@@ -1,4 +1,4 @@
-item,fixation,prime,mask,target,corresp,related,block,target cat
+Item,Fixation,Prime,Mask,Target,Corr_response,Related,Block_Name,Target_cat
 1,+,dragon,&&&&&&&&&&,monster,1,1,PRACTICE,???
 2,+,infant,&&&&&&&&&&,baby,1,1,PRACTICE,???
 3,+,storm,&&&&&&&&&&,cloud,1,1,PRACTICE,???
