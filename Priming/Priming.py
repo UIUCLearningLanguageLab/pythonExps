@@ -260,7 +260,7 @@ def prepare_pairs(item_data, config_dict):
                 practice_list = practice_list.sample(frac=1)
             trial_block_list.append(block_dataframe.reset_index())
 
-        practice_list = practice_list.reset_index()
+        practice_list = practice_list.reset_index(drop=True)
 
         return item_data, trial_block_list, practice_list
     # for situations with other than TEST
@@ -281,7 +281,7 @@ def prepare_pairs(item_data, config_dict):
 
             trial_block_list.append(block_dataframe.reset_index())
 
-        practice_list = practice_list.reset_index()
+        practice_list = practice_list.reset_index(drop=True)
 
         return item_data, trial_block_list, practice_list
 
