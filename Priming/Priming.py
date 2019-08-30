@@ -317,7 +317,7 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
     num_blocks = int(config_dict['BLOCKS'])
     show_instructions('Stimuli/Instructions/main_instructions.txt')
 
-    # determine task of the experiment and show corresponding instructions
+    # determine task of the experiment and show corresponding task instructions
     task = condition_dict['items'].split('_')[0]
     try:
         show_instructions('Stimuli/Instructions/task_instructions1.txt', task)
@@ -333,6 +333,7 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
     if len(practice_list) > 0:
         show_instructions('Stimuli/Instructions/practice_instructions.txt')
         block(practice_list, trial_event_list, 0, config_dict)
+        show_instructions('Stimuli/Instructions/start_test.txt')
     # When there are other "Block_Name" than TEST, get the number of block according to 
     # the NAME_SET
     if num_blocks < 0:
