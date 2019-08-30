@@ -1,0 +1,1 @@
+cd#In the following practice trials, you will be deciding if the second word is a flower.\n\nPress 1 if the second word is a flower. Press 2 if the second word is not a flower.\n\nPress the space bar when you are ready to begin.
