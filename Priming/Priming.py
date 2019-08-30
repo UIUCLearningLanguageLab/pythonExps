@@ -10,7 +10,7 @@ EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
 EVENT_TEXT_COLOR = 'pink'
 
-INSTRUCTION_TEXT_HEIGHT = 0.1
+INSTRUCTION_TEXT_HEIGHT = 0.06
 INSTRUCTION_FONT = 'Arial'
 INSTRUCTION_TEXT_COLOR = 'white'
 
@@ -309,13 +309,23 @@ def prepare_output_header(assigned_item_data, trial_block_list, trial_event_list
         filewriter.writerow(header_row)
 
 
-def experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list):
+def experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict):
     """
     This is the experiment function
     """
     # get the number of block
     num_blocks = int(config_dict['BLOCKS'])
     show_instructions('Stimuli/Instructions/main_instructions.txt')
+
+    # determine task of the experiment and show corresponding instructions
+    task = condition_dict['items'].split('_')[0]
+    try:
+        show_instructions('Stimuli/Instructions/task_instructions1.txt', task)
+        show_instructions('Stimuli/Instructions/task_instructions2.txt', task)
+        show_instructions('Stimuli/Instructions/task_instructions3.txt', task)
+    except KeyError:
+        pass
+
     prepare_output_header(assigned_item_data, trial_block_list, trial_event_list, config_dict)
     name_flag = False
     # When there are PRACTICE pairs
@@ -332,7 +342,7 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
             block_name = config_dict['NAME_SET'].split(' ')[i]
         else:
             block_name = 'TEST'
-        show_instructions('Stimuli/Instructions/block_instructions2.txt', block_name)
+        show_instructions('Stimuli/Instructions/block_instructions.txt', block_name)
         block(trial_block_list[i - 1], trial_event_list, i, config_dict)
         if i < num_blocks:
             show_instructions('Stimuli/Instructions/block_break.txt')
@@ -446,7 +456,7 @@ def main():
     trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
     if verify_items_and_events(item_data, trial_event_list):
         assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
-        experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list)
+        experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
         show_instructions('Stimuli/Instructions/end.txt')
     else:
         print('Data Error!')
