@@ -324,6 +324,7 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
         show_instructions('Stimuli/Instructions/task_instructions2.txt', task)
         show_instructions('Stimuli/Instructions/task_instructions3.txt', task)
     except KeyError:
+        print('no corresponding instructions in file')
         pass
 
     prepare_output_header(assigned_item_data, trial_block_list, trial_event_list, config_dict)
