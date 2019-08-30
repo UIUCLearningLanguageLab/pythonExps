@@ -1,4 +1,4 @@
-TEST#You will now complete the next portion of the experiment. It will consist of 4 trials and will take approximately 30 seconds. When you are ready, press the space bar to begin.
+TEST#You will now complete the next portion of the experiment. It will consist of 16 trials. When you are ready, press the space bar to begin.
 BIRD#In the following trials, you will be deciding if the second word is a bird.\nPress 1 if the second word is a bird. Press 2 if the second word is not a bird.\nPress the space bar when you are ready to begin.
 CLOTHING#In the following trials, you will be deciding if the second word is a type of clothing.\nPress 1 if the second word is a type of clothing. Press 2 if the second word is not a type of clothing.\nPress the space bar when you are ready to begin.
 FRUIT#In the following trials, you will be deciding if the second word is a fruit.\nPress 1 if the second word is a fruit. Press 2 if the second word is not a fruit.\nPress the space bar when you are ready to begin.

@@ -1,2 +1,0 @@
-Welcome! In this experiment, you will see read words on the screen and make keyboard responses. On each trial, you will first see a fixation cross: +, then see two words in quick succession. Your job is to press the "1" if you think this is a word, and the "2" key if it is not a word. Press the space bar to continue.
-We want to to make this decision as quickly and as accurately as you can. Place your left hand so your fingers are resting on the 1 and 2 keys, so you can make these responses as quickly as you can. PRESS THE SPACE BAR TO CONTINUE

@@ -1,1 +1,1 @@
-You have reached the end of our experiment. Thank you for participating!
+Good job! You're done!\n\nPress the space bar to exit.
