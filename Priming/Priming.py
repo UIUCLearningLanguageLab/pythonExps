@@ -1,10 +1,11 @@
-from psychopy import visual, core, event, sound
+from psychopy import visual, core, event, sound, monitors
 import numpy as np
 import pandas as pd
 import csv
 import random
 import os
 import collections
+from Xlib.display import Display
 
 EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
@@ -24,7 +25,10 @@ FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
-win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
+screen = Display(':0').screen()
+display_width = screen.width_in_pixels
+mon = monitors.Monitor(name='mon', width=display_width)
+win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor=mon, fullscr=False)
 
 
 def display_instruction_words(instruction_text):
