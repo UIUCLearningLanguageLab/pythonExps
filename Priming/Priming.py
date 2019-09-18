@@ -5,7 +5,7 @@ import csv
 import random
 import os
 import collections
-from Xlib.display import Display
+import tkinter
 
 EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
@@ -25,10 +25,15 @@ FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
-screen = Display(':0').screen()
-display_width = screen.width_in_pixels
-mon = monitors.Monitor(name='mon', width=display_width)
-win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor=mon, fullscr=False)
+root = tkinter.Tk()
+width = root.winfo_screenwidth()
+height = root.winfo_screenheight()
+xydim = (width, height)
+mon = monitors.Monitor(name='mon')
+mon.setSizePix(xydim)
+mon.save()
+
+win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor='mon', fullscr=False)
 
 
 def display_instruction_words(instruction_text):
