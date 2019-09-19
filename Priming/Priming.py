@@ -30,7 +30,6 @@ width = root.winfo_screenwidth()
 height = root.winfo_screenheight()
 xydim = (width, height)
 mon = monitors.Monitor(name='mon')
-mon.setSizePix(xydim)
 mon.save()
 
 win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor='mon', fullscr=False)

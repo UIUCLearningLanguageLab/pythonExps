@@ -1,0 +1,3 @@
+pandas
+psychopy
+pyglet==1.3.2
