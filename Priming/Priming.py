@@ -5,7 +5,7 @@ import csv
 import random
 import os
 import collections
-import tkinter
+import tkinter as tk
 
 EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
@@ -25,15 +25,67 @@ FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
-root = tkinter.Tk()
-width = root.winfo_screenwidth()
-height = root.winfo_screenheight()
-xydim = (width, height)
-mon = monitors.Monitor(name='mon')
-mon.save()
 
-win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor='mon', fullscr=False)
 
+
+
+def configure(file, par, value):
+    f = load_data(file)
+    f.loc[par, 1] = value
+    f.to_csv(file, index=False)
+
+
+def read_options():
+    pass
+
+
+def gui(config_dict, condition_dict):
+    root = tk.Tk()
+
+    blocks = tk.StringVar()
+    blocks.set(config_dict["BLOCKS"])
+    key = tk.StringVar()
+    key.set(config_dict["KEY"])
+    timeout = tk.StringVar()
+    timeout.set(config_dict["TIMEOUT"])
+    name_set = tk.StringVar()
+    name_set.set(config_dict["NAME_SET"])
+
+    # this block is reading screen width and height for psychopy
+    width = root.winfo_screenwidth()
+    height = root.winfo_screenheight()
+    xydim = (width, height)
+    mon = monitors.Monitor(name='mon')
+    mon.save()
+
+    # putting up Entries and Dropdown menus
+    label_BLOCKS = tk.Label(root, text='BLOCKS')
+    label_KEY = tk.Label(root, text='KEY')
+    label_TIMEOUT = tk.Label(root, text='TIMEOUT')
+    label_NAME_SET = tk.Label(root, text='NAME_SET')
+
+    entry_BLOCKS = tk.Entry(root, textvariable=blocks)
+    entry_KEY = tk.Entry(root, textvariable=key)
+    entry_TIMEOUT = tk.Entry(root, textvariable=timeout)
+    entry_NAME_SET = tk.Entry(root, textvariable=name_set)
+    # RAND_WITHIN_BLOCKS =
+    # RAND_BLOCKS =
+
+    label_BLOCKS.grid(row=0)
+    label_KEY.grid(row=1)
+    label_TIMEOUT.grid(row=2)
+    label_NAME_SET.grid(row=3)
+    entry_BLOCKS.grid(row=0, column=1)
+    entry_KEY.grid(row=1, column=1)
+    entry_TIMEOUT.grid(row=2, column=1)
+    entry_NAME_SET.grid(row=3, column=1)
+
+    # items =
+    # trial_events =
+
+
+
+    root.mainloop()
 
 def display_instruction_words(instruction_text):
     """
@@ -461,15 +513,19 @@ def prepare(config_dict, condition_dict):
 def main():
     config_dict = load_dict('config.csv')
     condition_dict = load_dict('conditions.csv')
-    prepare(config_dict, condition_dict)
-    item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
-    trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
-    if verify_items_and_events(item_data, trial_event_list):
-        assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
-        experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
-        show_instructions('Stimuli/Instructions/end.txt')
-    else:
-        print('Data Error!')
+
+    gui(config_dict, condition_dict)
+    # win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor='mon', fullscr=False)
+    #
+    # prepare(config_dict, condition_dict)
+    # item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
+    # trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
+    # if verify_items_and_events(item_data, trial_event_list):
+    #     assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
+    #     experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
+    #     show_instructions('Stimuli/Instructions/end.txt')
+    # else:
+    #     print('Data Error!')
 
 
 main()
