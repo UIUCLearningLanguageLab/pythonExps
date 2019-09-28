@@ -27,7 +27,17 @@ RAND_WITHIN_BLOCKS = True
 
 
 def read_options():
-    pass
+    # list_options = os.listdir('Stimuli/Item_Lists')
+    # soa_options = os.listdir('Events')
+
+    list_options = [os.path.splitext(file)[0] for file
+                    in os.listdir('Stimuli/Item_Lists')]
+    soa_options = [os.path.splitext(file)[0] for file
+                    in os.listdir('Events')]
+    list_options.sort()
+    soa_options.sort()
+
+    return list_options, soa_options
 
 
 def gui(config_dict, condition_dict):
@@ -45,6 +55,10 @@ def gui(config_dict, condition_dict):
     rand_within_blocks.set(config_dict['RAND_WITHIN_BLOCKS'])
     rand_blocks = tk.StringVar()
     rand_blocks.set(config_dict['RAND_BLOCKS'])
+    item_list = tk.StringVar()
+    item_list.set(condition_dict['items'])
+    trial_events = tk.StringVar()
+    trial_events.set(condition_dict['trial_events'])
 
     # this block is reading screen width and height for psychopy
     width = root.winfo_screenwidth()
@@ -60,6 +74,8 @@ def gui(config_dict, condition_dict):
     label_NAME_SET = tk.Label(root, text='NAME_SET')
     label_RAND_WITHIN_BLOCK = tk.Label(root, text='RAND_WITHIN_BLOCK')
     label_RAND_BLOCKS = tk.Label(root, text='RAND_BLOCKS')
+    label_ITEM_LISTS = tk.Label(root, text='Item List')
+    label_SOA = tk.Label(root, text='SOA')
 
     entry_BLOCKS = tk.Entry(root, textvariable=blocks)
     entry_KEY = tk.Entry(root, textvariable=key)
@@ -67,10 +83,14 @@ def gui(config_dict, condition_dict):
     entry_NAME_SET = tk.Entry(root, textvariable=name_set)
     option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(root, rand_within_blocks, "TRUE", "FALSE")
     option_menu_RAND_BLOCKS = tk.OptionMenu(root, rand_blocks, "TRUE", "FALSE")
+    item_lists_list, soa_list = read_options()
+    option_menu_item_lists = tk.OptionMenu(root, item_list, *item_lists_list)
+    option_menu_soa = tk.OptionMenu(root, trial_events, *soa_list)
     button_save = tk.Button(root, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict,
                                                                              entry_BLOCKS, entry_KEY, entry_TIMEOUT,
                                                                              entry_NAME_SET,
-                                                                             rand_within_blocks, rand_blocks))
+                                                                             rand_within_blocks, rand_blocks,
+                                                                             item_list, trial_events))
 
     label_BLOCKS.grid(row=0)
     label_KEY.grid(row=1)
@@ -78,6 +98,8 @@ def gui(config_dict, condition_dict):
     label_NAME_SET.grid(row=3)
     label_RAND_WITHIN_BLOCK.grid(row=4)
     label_RAND_BLOCKS.grid(row=5)
+    label_ITEM_LISTS.grid(row=0, column=2)
+    label_SOA.grid(row=1, column=2)
 
     entry_BLOCKS.grid(row=0, column=1)
     entry_KEY.grid(row=1, column=1)
@@ -85,7 +107,9 @@ def gui(config_dict, condition_dict):
     entry_NAME_SET.grid(row=3, column=1)
     option_menu_RAND_WITHIN_BLOCKS.grid(row=4, column=1)
     option_menu_RAND_BLOCKS.grid(row=5, column=1)
-    button_save.grid(columnspan=2)
+    button_save.grid(columnspan=5)
+    option_menu_item_lists.grid(row=0, column=3)
+    option_menu_soa.grid(row=1, column=3)
 
     # items =
     # trial_events =
@@ -94,18 +118,27 @@ def gui(config_dict, condition_dict):
     root.mainloop()
 
 
-def save_changes(root, config_dict, condition_dict, entry_BLOCKS, entry_KEY, entry_TIMEOUT, entry_NAME_SET,
-                 rand_within_blocks, rand_blocks):
-    config_dict['BLOCKS'] = entry_BLOCKS.get()
-    config_dict['KEY'] = entry_KEY.get()
-    config_dict['TIMEOUT'] = entry_TIMEOUT.get()
-    config_dict['NAME_SET'] = entry_NAME_SET.get()
+def save_changes(root, config_dict, condition_dict, blocks, key, timeout, name_set,
+                 rand_within_blocks, rand_blocks, item_list, trial_events):
+    config_dict['BLOCKS'] = blocks.get()
+    config_dict['KEY'] = key.get()
+    config_dict['TIMEOUT'] = timeout.get()
+    config_dict['NAME_SET'] = name_set.get()
     config_dict['RAND_WITHIN_BLOCKS'] = rand_within_blocks.get()
     config_dict['RAND_BLOCKS'] = rand_blocks.get()
+
+    condition_dict['items'] = item_list.get()
+    condition_dict['trial_events'] = trial_events.get()
 
     with open('config.csv', 'w') as f:
         for key in config_dict.keys():
             f.write("%s,%s\n" % (key, config_dict[key]))
+        f.close()
+
+    with open('conditions.csv', 'w') as f:
+        for key in condition_dict.keys():
+            f.write("%s,%s\n" % (key, condition_dict[key]))
+        f.close()
 
     root.destroy()
 
@@ -549,5 +582,5 @@ def main():
     else:
         print('Data Error!')
 
-win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor='mon', fullscr=False)
+win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
 main()
