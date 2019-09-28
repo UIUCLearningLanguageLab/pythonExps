@@ -27,8 +27,6 @@ RAND_WITHIN_BLOCKS = True
 
 
 
-
-
 def configure(file, par, value):
     f = load_data(file)
     f.loc[par, 1] = value
@@ -70,6 +68,7 @@ def gui(config_dict, condition_dict):
     entry_NAME_SET = tk.Entry(root, textvariable=name_set)
     # RAND_WITHIN_BLOCKS =
     # RAND_BLOCKS =
+    button_save = tk.Button(root, text='Save Changes', command=lambda : save_changes(root, config_dict, condition_dict, entry_BLOCKS, entry_KEY, entry_TIMEOUT, entry_NAME_SET))
 
     label_BLOCKS.grid(row=0)
     label_KEY.grid(row=1)
@@ -79,13 +78,27 @@ def gui(config_dict, condition_dict):
     entry_KEY.grid(row=1, column=1)
     entry_TIMEOUT.grid(row=2, column=1)
     entry_NAME_SET.grid(row=3, column=1)
+    button_save.grid(columnspan=2)
 
     # items =
     # trial_events =
 
 
-
     root.mainloop()
+
+
+def save_changes(root, config_dict, condition_dict, entry_BLOCKS, entry_KEY, entry_TIMEOUT, entry_NAME_SET):
+    config_dict['BLOCKS'] = entry_BLOCKS.get()
+    config_dict['KEY'] = entry_KEY.get()
+    config_dict['TIMEOUT'] = entry_TIMEOUT.get()
+    config_dict['NAME_SET'] = entry_NAME_SET.get()
+
+    with open('config.csv', 'w') as f:
+        for key in config_dict.keys():
+            f.write("%s,%s\n" % (key, config_dict[key]))
+
+    root.destroy()
+
 
 def display_instruction_words(instruction_text):
     """
@@ -119,7 +132,7 @@ def display_event_words(event_text, duration, key_list, type):
     pos[4][2] = (0.5, 0.5)
     pos[4][3] = (-0.5, -0.5)
     pos[4][4] = (0.5, -0.5)
-    
+
     timer = core.Clock()
     timer.reset()
     win.flip()
@@ -265,9 +278,9 @@ def prepare_pairs(item_data, config_dict):
     This function randomize the order of item_data and return the list of item data for practice
     and each block
     A list of things done:
-    1. check whether it has a feedback column, if there is, show image or display sound when the 
+    1. check whether it has a feedback column, if there is, show image or display sound when the
     answer is wrong
-    2. when num_blocks is positive, there are only PRACTICE and TEST, 
+    2. when num_blocks is positive, there are only PRACTICE and TEST,
     and all PRACTICE are list before TEST in csv file, and here random assign TEST to blocks;
     when num_blocks is negative, there are other Block_Name than PRACTICE and TEST, assign data to block
     according to the block_name, and shuffle the data in each block. The display order of block is same as
@@ -279,7 +292,7 @@ def prepare_pairs(item_data, config_dict):
     num_blocks = int(config_dict['BLOCKS'])
     name_set = config_dict['NAME_SET'].split(' ')
     num_items = len(item_data)
-    
+
     # for situation with only PRACTICE and TEST
     if num_blocks > 0:
         block_list = []
@@ -394,7 +407,7 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
         show_instructions('Stimuli/Instructions/practice_instructions.txt')
         block(practice_list, trial_event_list, 0, config_dict)
         show_instructions('Stimuli/Instructions/start_test.txt')
-    # When there are other "Block_Name" than TEST, get the number of block according to 
+    # When there are other "Block_Name" than TEST, get the number of block according to
     # the NAME_SET
     if num_blocks < 0:
         num_blocks = len(config_dict['NAME_SET'].split(' ')) - 1
@@ -515,17 +528,16 @@ def main():
     condition_dict = load_dict('conditions.csv')
 
     gui(config_dict, condition_dict)
-    # win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor='mon', fullscr=False)
-    #
-    # prepare(config_dict, condition_dict)
-    # item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
-    # trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
-    # if verify_items_and_events(item_data, trial_event_list):
-    #     assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
-    #     experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
-    #     show_instructions('Stimuli/Instructions/end.txt')
-    # else:
-    #     print('Data Error!')
 
+    prepare(config_dict, condition_dict)
+    item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
+    trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
+    if verify_items_and_events(item_data, trial_event_list):
+        assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
+        experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
+        show_instructions('Stimuli/Instructions/end.txt')
+    else:
+        print('Data Error!')
 
+win = visual.Window(size=(1000, 600), color=(-1, -1, -1), monitor='mon', fullscr=False)
 main()
