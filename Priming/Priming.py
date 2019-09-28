@@ -27,21 +27,24 @@ RAND_WITHIN_BLOCKS = True
 
 
 def read_options():
-    # list_options = os.listdir('Stimuli/Item_Lists')
-    # soa_options = os.listdir('Events')
-
     list_options = [os.path.splitext(file)[0] for file
                     in os.listdir('Stimuli/Item_Lists')]
     soa_options = [os.path.splitext(file)[0] for file
                     in os.listdir('Events')]
+    task_options = load_dict('Stimuli/Tasks/Tasks.csv')
+    task_options = list(task_options.keys())
+
+
     list_options.sort()
     soa_options.sort()
+    task_options.sort()
 
-    return list_options, soa_options
+    return list_options, soa_options, task_options
 
 
-def gui(config_dict, condition_dict):
+def gui(config_dict, condition_dict, task_dict):
     root = tk.Tk()
+    item_lists_list, soa_list, task_list = read_options()
 
     blocks = tk.StringVar()
     blocks.set(config_dict["BLOCKS"])
@@ -49,8 +52,8 @@ def gui(config_dict, condition_dict):
     key.set(config_dict["KEY"])
     timeout = tk.StringVar()
     timeout.set(config_dict["TIMEOUT"])
-    name_set = tk.StringVar()
-    name_set.set(config_dict["NAME_SET"])
+    task = tk.StringVar()
+    task.set(config_dict["TASK"])
     rand_within_blocks = tk.StringVar()
     rand_within_blocks.set(config_dict['RAND_WITHIN_BLOCKS'])
     rand_blocks = tk.StringVar()
@@ -60,18 +63,10 @@ def gui(config_dict, condition_dict):
     trial_events = tk.StringVar()
     trial_events.set(condition_dict['trial_events'])
 
-    # this block is reading screen width and height for psychopy
-    width = root.winfo_screenwidth()
-    height = root.winfo_screenheight()
-    xydim = (width, height)
-    mon = monitors.Monitor(name='mon')
-    mon.save()
-
-    # putting up Entries and Dropdown menus
     label_BLOCKS = tk.Label(root, text='BLOCKS')
     label_KEY = tk.Label(root, text='KEY')
     label_TIMEOUT = tk.Label(root, text='TIMEOUT')
-    label_NAME_SET = tk.Label(root, text='NAME_SET')
+    label_TASK = tk.Label(root, text='TASK')
     label_RAND_WITHIN_BLOCK = tk.Label(root, text='RAND_WITHIN_BLOCK')
     label_RAND_BLOCKS = tk.Label(root, text='RAND_BLOCKS')
     label_ITEM_LISTS = tk.Label(root, text='Item List')
@@ -80,22 +75,20 @@ def gui(config_dict, condition_dict):
     entry_BLOCKS = tk.Entry(root, textvariable=blocks)
     entry_KEY = tk.Entry(root, textvariable=key)
     entry_TIMEOUT = tk.Entry(root, textvariable=timeout)
-    entry_NAME_SET = tk.Entry(root, textvariable=name_set)
+    option_menu_TASK = tk.OptionMenu(root, task, *task_list)
     option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(root, rand_within_blocks, "TRUE", "FALSE")
     option_menu_RAND_BLOCKS = tk.OptionMenu(root, rand_blocks, "TRUE", "FALSE")
-    item_lists_list, soa_list = read_options()
     option_menu_item_lists = tk.OptionMenu(root, item_list, *item_lists_list)
     option_menu_soa = tk.OptionMenu(root, trial_events, *soa_list)
-    button_save = tk.Button(root, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict,
+    button_save = tk.Button(root, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict, task_dict,
                                                                              entry_BLOCKS, entry_KEY, entry_TIMEOUT,
-                                                                             entry_NAME_SET,
-                                                                             rand_within_blocks, rand_blocks,
+                                                                             task, rand_within_blocks, rand_blocks,
                                                                              item_list, trial_events))
 
     label_BLOCKS.grid(row=0)
     label_KEY.grid(row=1)
     label_TIMEOUT.grid(row=2)
-    label_NAME_SET.grid(row=3)
+    label_TASK.grid(row=3)
     label_RAND_WITHIN_BLOCK.grid(row=4)
     label_RAND_BLOCKS.grid(row=5)
     label_ITEM_LISTS.grid(row=0, column=2)
@@ -104,26 +97,23 @@ def gui(config_dict, condition_dict):
     entry_BLOCKS.grid(row=0, column=1)
     entry_KEY.grid(row=1, column=1)
     entry_TIMEOUT.grid(row=2, column=1)
-    entry_NAME_SET.grid(row=3, column=1)
+    option_menu_TASK.grid(row=3, column=1)
     option_menu_RAND_WITHIN_BLOCKS.grid(row=4, column=1)
     option_menu_RAND_BLOCKS.grid(row=5, column=1)
     button_save.grid(columnspan=5)
     option_menu_item_lists.grid(row=0, column=3)
     option_menu_soa.grid(row=1, column=3)
 
-    # items =
-    # trial_events =
-
-
     root.mainloop()
 
 
-def save_changes(root, config_dict, condition_dict, blocks, key, timeout, name_set,
+def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, timeout, task,
                  rand_within_blocks, rand_blocks, item_list, trial_events):
     config_dict['BLOCKS'] = blocks.get()
     config_dict['KEY'] = key.get()
     config_dict['TIMEOUT'] = timeout.get()
-    config_dict['NAME_SET'] = name_set.get()
+    config_dict['NAME_SET'] = task_dict[str(config_dict["TASK"])]
+    config_dict['TASK'] = task.get()
     config_dict['RAND_WITHIN_BLOCKS'] = rand_within_blocks.get()
     config_dict['RAND_BLOCKS'] = rand_blocks.get()
 
@@ -569,8 +559,9 @@ def prepare(config_dict, condition_dict):
 def main():
     config_dict = load_dict('config.csv')
     condition_dict = load_dict('conditions.csv')
+    task_dict = load_dict('Stimuli/Tasks/Tasks.csv')
 
-    gui(config_dict, condition_dict)
+    gui(config_dict, condition_dict, task_dict)
 
     prepare(config_dict, condition_dict)
     item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
