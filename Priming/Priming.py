@@ -26,13 +26,6 @@ RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
 
-
-def configure(file, par, value):
-    f = load_data(file)
-    f.loc[par, 1] = value
-    f.to_csv(file, index=False)
-
-
 def read_options():
     pass
 
@@ -48,6 +41,10 @@ def gui(config_dict, condition_dict):
     timeout.set(config_dict["TIMEOUT"])
     name_set = tk.StringVar()
     name_set.set(config_dict["NAME_SET"])
+    rand_within_blocks = tk.StringVar()
+    rand_within_blocks.set(config_dict['RAND_WITHIN_BLOCKS'])
+    rand_blocks = tk.StringVar()
+    rand_blocks.set(config_dict['RAND_BLOCKS'])
 
     # this block is reading screen width and height for psychopy
     width = root.winfo_screenwidth()
@@ -61,23 +58,33 @@ def gui(config_dict, condition_dict):
     label_KEY = tk.Label(root, text='KEY')
     label_TIMEOUT = tk.Label(root, text='TIMEOUT')
     label_NAME_SET = tk.Label(root, text='NAME_SET')
+    label_RAND_WITHIN_BLOCK = tk.Label(root, text='RAND_WITHIN_BLOCK')
+    label_RAND_BLOCKS = tk.Label(root, text='RAND_BLOCKS')
 
     entry_BLOCKS = tk.Entry(root, textvariable=blocks)
     entry_KEY = tk.Entry(root, textvariable=key)
     entry_TIMEOUT = tk.Entry(root, textvariable=timeout)
     entry_NAME_SET = tk.Entry(root, textvariable=name_set)
-    # RAND_WITHIN_BLOCKS =
-    # RAND_BLOCKS =
-    button_save = tk.Button(root, text='Save Changes', command=lambda : save_changes(root, config_dict, condition_dict, entry_BLOCKS, entry_KEY, entry_TIMEOUT, entry_NAME_SET))
+    option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(root, rand_within_blocks, "TRUE", "FALSE")
+    option_menu_RAND_BLOCKS = tk.OptionMenu(root, rand_blocks, "TRUE", "FALSE")
+    button_save = tk.Button(root, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict,
+                                                                             entry_BLOCKS, entry_KEY, entry_TIMEOUT,
+                                                                             entry_NAME_SET,
+                                                                             rand_within_blocks, rand_blocks))
 
     label_BLOCKS.grid(row=0)
     label_KEY.grid(row=1)
     label_TIMEOUT.grid(row=2)
     label_NAME_SET.grid(row=3)
+    label_RAND_WITHIN_BLOCK.grid(row=4)
+    label_RAND_BLOCKS.grid(row=5)
+
     entry_BLOCKS.grid(row=0, column=1)
     entry_KEY.grid(row=1, column=1)
     entry_TIMEOUT.grid(row=2, column=1)
     entry_NAME_SET.grid(row=3, column=1)
+    option_menu_RAND_WITHIN_BLOCKS.grid(row=4, column=1)
+    option_menu_RAND_BLOCKS.grid(row=5, column=1)
     button_save.grid(columnspan=2)
 
     # items =
@@ -87,11 +94,14 @@ def gui(config_dict, condition_dict):
     root.mainloop()
 
 
-def save_changes(root, config_dict, condition_dict, entry_BLOCKS, entry_KEY, entry_TIMEOUT, entry_NAME_SET):
+def save_changes(root, config_dict, condition_dict, entry_BLOCKS, entry_KEY, entry_TIMEOUT, entry_NAME_SET,
+                 rand_within_blocks, rand_blocks):
     config_dict['BLOCKS'] = entry_BLOCKS.get()
     config_dict['KEY'] = entry_KEY.get()
     config_dict['TIMEOUT'] = entry_TIMEOUT.get()
     config_dict['NAME_SET'] = entry_NAME_SET.get()
+    config_dict['RAND_WITHIN_BLOCKS'] = rand_within_blocks.get()
+    config_dict['RAND_BLOCKS'] = rand_blocks.get()
 
     with open('config.csv', 'w') as f:
         for key in config_dict.keys():
