@@ -18,12 +18,20 @@ INSTRUCTION_TEXT_COLOR = 'white'
 TIME_OUT = 1000
 FILE_NAME = ''
 EXPNAME = ''
+EXPERIMENTER = ''
 SUBJECTID = ''
 ITEM_LIST = ''
 CONDITION = ''
 FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
+
+def write_log():
+    # with open('experiment_log.csv', 'w') as f:
+    #     for key in config_dict.keys():
+    #         f.write("%s,%s\n" % (key, config_dict[key]))
+    #     f.close()
+
 
 
 def read_options():
@@ -62,9 +70,11 @@ def gui(config_dict, condition_dict, task_dict):
     item_list.set(condition_dict['items'])
     trial_events = tk.StringVar()
     trial_events.set(condition_dict['trial_events'])
+    experimenter = tk.StringVar()
+    subjectid = tk.StringVar()
 
-    label_configcsv = tk.Label(root, text='config.csv')
-    label_conditionscsv = tk.Label(root, text='conditions.csv')
+    label_configcsv = tk.Label(root, text='config.csv', relief='solid')
+    label_conditionscsv = tk.Label(root, text='conditions.csv', relief='solid')
     label_BLOCKS = tk.Label(root, text='BLOCKS')
     label_KEY = tk.Label(root, text='KEY')
     label_TIMEOUT = tk.Label(root, text='TIMEOUT')
@@ -73,6 +83,9 @@ def gui(config_dict, condition_dict, task_dict):
     label_RAND_BLOCKS = tk.Label(root, text='RAND_BLOCKS')
     label_ITEM_LISTS = tk.Label(root, text='Item List')
     label_SOA = tk.Label(root, text='SOA')
+    label_Experimenter = tk.Label(root, text='Experimenter')
+    label_SubjectID = tk.Label(root, text='Subject ID')
+    label_logcsv = tk.Label(root, text='experiment_log.csv', relief='solid')
 
     entry_BLOCKS = tk.Entry(root, textvariable=blocks)
     entry_KEY = tk.Entry(root, textvariable=key)
@@ -85,33 +98,42 @@ def gui(config_dict, condition_dict, task_dict):
     button_save = tk.Button(root, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict, task_dict,
                                                                              entry_BLOCKS, entry_KEY, entry_TIMEOUT,
                                                                              task, rand_within_blocks, rand_blocks,
-                                                                             item_list, trial_events))
+                                                                             item_list, trial_events, experimenter, subjectid))
+    entry_Experimenter = tk.Entry(root, textvariable=experimenter, justify='center')
+    entry_SubjectID = tk.Entry(root, textvariable=subjectid, justify='center')
+
     label_configcsv.grid(row=0, column=0, columnspan=2)
     label_conditionscsv.grid(row=0, column=2, columnspan=2)
-    label_BLOCKS.grid(row=1)
-    label_KEY.grid(row=2)
-    label_TIMEOUT.grid(row=3)
-    label_TASK.grid(row=4)
-    label_RAND_WITHIN_BLOCK.grid(row=5)
-    label_RAND_BLOCKS.grid(row=6)
-    label_ITEM_LISTS.grid(row=1, column=2)
-    label_SOA.grid(row=2, column=2)
+    label_BLOCKS.grid(row=1, sticky='W')
+    label_KEY.grid(row=2, sticky='W')
+    label_TIMEOUT.grid(row=3, sticky='W')
+    label_TASK.grid(row=4, sticky='W')
+    label_RAND_WITHIN_BLOCK.grid(row=5, sticky='W')
+    label_RAND_BLOCKS.grid(row=6, sticky='W')
+    label_ITEM_LISTS.grid(row=1, column=2, sticky='W')
+    label_SOA.grid(row=2, column=2, sticky='W')
+    label_Experimenter.grid(row=8, column=0, columnspan=4)
+    label_SubjectID.grid(row=10, column=0, columnspan=4)
+    label_logcsv.grid(row=7, column=0, columnspan=4, pady=(50, 0))
 
-    entry_BLOCKS.grid(row=1, column=1)
-    entry_KEY.grid(row=2, column=1)
-    entry_TIMEOUT.grid(row=3, column=1)
-    option_menu_TASK.grid(row=4, column=1)
-    option_menu_RAND_WITHIN_BLOCKS.grid(row=5, column=1)
-    option_menu_RAND_BLOCKS.grid(row=6, column=1)
-    button_save.grid(columnspan=5)
-    option_menu_item_lists.grid(row=1, column=3)
-    option_menu_soa.grid(row=2, column=3)
+    entry_BLOCKS.grid(row=1, column=1, sticky='W')
+    entry_KEY.grid(row=2, column=1, sticky='W')
+    entry_TIMEOUT.grid(row=3, column=1, sticky='W')
+    option_menu_TASK.grid(row=4, column=1, sticky='W')
+    option_menu_RAND_WITHIN_BLOCKS.grid(row=5, column=1, sticky='W')
+    option_menu_RAND_BLOCKS.grid(row=6, column=1, sticky='W')
+    button_save.grid(row=12, columnspan=4)
+    option_menu_item_lists.grid(row=1, column=3, sticky='W')
+    option_menu_soa.grid(row=2, column=3, sticky='W')
+    entry_Experimenter.grid(row=9, column=0, columnspan=4)
+    entry_SubjectID.grid(row=11, column=0, columnspan=4)
 
     root.mainloop()
 
 
 def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, timeout, task,
-                 rand_within_blocks, rand_blocks, item_list, trial_events):
+                 rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid):
+    global EXPERIMENTER, SUBJECTID
     config_dict['BLOCKS'] = blocks.get()
     config_dict['KEY'] = key.get()
     config_dict['TIMEOUT'] = timeout.get()
@@ -122,6 +144,9 @@ def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, time
 
     condition_dict['items'] = item_list.get()
     condition_dict['trial_events'] = trial_events.get()
+
+    EXPERIMENTER = experimenter.get()
+    SUBJECTID = subjectid.get()
 
     with open('config.csv', 'w') as f:
         for key in config_dict.keys():
