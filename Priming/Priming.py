@@ -31,7 +31,7 @@ def write_log():
     #     for key in config_dict.keys():
     #         f.write("%s,%s\n" % (key, config_dict[key]))
     #     f.close()
-
+    pass
 
 
 def read_options():
