@@ -73,60 +73,67 @@ def gui(config_dict, condition_dict, task_dict):
     experimenter = tk.StringVar()
     subjectid = tk.StringVar()
 
-    label_configcsv = tk.Label(root, text='config.csv', relief='solid')
-    label_conditionscsv = tk.Label(root, text='conditions.csv', relief='solid')
-    label_BLOCKS = tk.Label(root, text='BLOCKS')
-    label_KEY = tk.Label(root, text='KEY')
-    label_TIMEOUT = tk.Label(root, text='TIMEOUT')
-    label_TASK = tk.Label(root, text='TASK')
-    label_RAND_WITHIN_BLOCK = tk.Label(root, text='RAND_WITHIN_BLOCK')
-    label_RAND_BLOCKS = tk.Label(root, text='RAND_BLOCKS')
-    label_ITEM_LISTS = tk.Label(root, text='Item List')
-    label_SOA = tk.Label(root, text='SOA')
-    label_Experimenter = tk.Label(root, text='Experimenter')
-    label_SubjectID = tk.Label(root, text='Subject ID')
-    label_logcsv = tk.Label(root, text='experiment_log.csv', relief='solid')
-
-    entry_BLOCKS = tk.Entry(root, textvariable=blocks)
-    entry_KEY = tk.Entry(root, textvariable=key)
-    entry_TIMEOUT = tk.Entry(root, textvariable=timeout)
-    option_menu_TASK = tk.OptionMenu(root, task, *task_list)
-    option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(root, rand_within_blocks, "TRUE", "FALSE")
-    option_menu_RAND_BLOCKS = tk.OptionMenu(root, rand_blocks, "TRUE", "FALSE")
-    option_menu_item_lists = tk.OptionMenu(root, item_list, *item_lists_list)
-    option_menu_soa = tk.OptionMenu(root, trial_events, *soa_list)
-    button_save = tk.Button(root, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict, task_dict,
-                                                                             entry_BLOCKS, entry_KEY, entry_TIMEOUT,
-                                                                             task, rand_within_blocks, rand_blocks,
-                                                                             item_list, trial_events, experimenter, subjectid))
-    entry_Experimenter = tk.Entry(root, textvariable=experimenter, justify='center')
-    entry_SubjectID = tk.Entry(root, textvariable=subjectid, justify='center')
-
+    frame_topleft = tk.Frame(root, height=50, width=50)
+    frame_topleft.grid(row=0, column=0)
+    label_configcsv = tk.Label(frame_topleft, text='config.csv', relief='solid')
+    label_BLOCKS = tk.Label(frame_topleft, text='BLOCKS')
+    label_KEY = tk.Label(frame_topleft, text='KEY')
+    label_TIMEOUT = tk.Label(frame_topleft, text='TIMEOUT')
+    label_TASK = tk.Label(frame_topleft, text='TASK')
+    label_RAND_WITHIN_BLOCK = tk.Label(frame_topleft, text='RAND_WITHIN_BLOCK')
+    label_RAND_BLOCKS = tk.Label(frame_topleft, text='RAND_BLOCKS')
+    entry_BLOCKS = tk.Entry(frame_topleft, textvariable=blocks)
+    entry_KEY = tk.Entry(frame_topleft, textvariable=key)
+    entry_TIMEOUT = tk.Entry(frame_topleft, textvariable=timeout)
+    option_menu_TASK = tk.OptionMenu(frame_topleft, task, *task_list)
+    option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(frame_topleft, rand_within_blocks, "TRUE", "FALSE")
+    option_menu_RAND_BLOCKS = tk.OptionMenu(frame_topleft, rand_blocks, "TRUE", "FALSE")
     label_configcsv.grid(row=0, column=0, columnspan=2)
-    label_conditionscsv.grid(row=0, column=2, columnspan=2)
     label_BLOCKS.grid(row=1, sticky='W')
     label_KEY.grid(row=2, sticky='W')
     label_TIMEOUT.grid(row=3, sticky='W')
     label_TASK.grid(row=4, sticky='W')
     label_RAND_WITHIN_BLOCK.grid(row=5, sticky='W')
     label_RAND_BLOCKS.grid(row=6, sticky='W')
-    label_ITEM_LISTS.grid(row=1, column=2, sticky='W')
-    label_SOA.grid(row=2, column=2, sticky='W')
-    label_Experimenter.grid(row=8, column=0, columnspan=4)
-    label_SubjectID.grid(row=10, column=0, columnspan=4)
-    label_logcsv.grid(row=7, column=0, columnspan=4, pady=(50, 0))
-
     entry_BLOCKS.grid(row=1, column=1, sticky='W')
     entry_KEY.grid(row=2, column=1, sticky='W')
     entry_TIMEOUT.grid(row=3, column=1, sticky='W')
     option_menu_TASK.grid(row=4, column=1, sticky='W')
     option_menu_RAND_WITHIN_BLOCKS.grid(row=5, column=1, sticky='W')
     option_menu_RAND_BLOCKS.grid(row=6, column=1, sticky='W')
-    button_save.grid(row=12, columnspan=4)
-    option_menu_item_lists.grid(row=1, column=3, sticky='W')
-    option_menu_soa.grid(row=2, column=3, sticky='W')
-    entry_Experimenter.grid(row=9, column=0, columnspan=4)
-    entry_SubjectID.grid(row=11, column=0, columnspan=4)
+
+
+    frame_topright = tk.Frame(root, height=500000000, width=50)
+    frame_topright.grid(row=0, column=1)
+    label_conditionscsv = tk.Label(frame_topright, text='conditions.csv', relief='solid')
+    label_ITEM_LISTS = tk.Label(frame_topright, text='Item List')
+    label_SOA = tk.Label(frame_topright, text='SOA')
+    option_menu_item_lists = tk.OptionMenu(frame_topright, item_list, *item_lists_list)
+    option_menu_soa = tk.OptionMenu(frame_topright, trial_events, *soa_list)
+    label_conditionscsv.grid(row=0, columnspan=2, sticky='N')
+    label_ITEM_LISTS.grid(row=1, sticky='NW')
+    label_SOA.grid(row=2, sticky='NW')
+    option_menu_item_lists.grid(row=1, column=1, sticky='NW')
+    option_menu_soa.grid(row=2, column=1, sticky='NW')
+
+
+    frame_bottom = tk.Frame(root)
+    frame_bottom.grid(row=1, columnspan=2)
+    label_Experimenter = tk.Label(frame_bottom, text='Experimenter')
+    label_SubjectID = tk.Label(frame_bottom, text='Subject ID')
+    label_logcsv = tk.Label(frame_bottom, text='experiment_log.csv', relief='solid')
+    button_save = tk.Button(frame_bottom, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict, task_dict,
+                                                                             entry_BLOCKS, entry_KEY, entry_TIMEOUT,
+                                                                             task, rand_within_blocks, rand_blocks,
+                                                                             item_list, trial_events, experimenter, subjectid))
+    entry_Experimenter = tk.Entry(frame_bottom, textvariable=experimenter, justify='center')
+    entry_SubjectID = tk.Entry(frame_bottom, textvariable=subjectid, justify='center')
+    label_Experimenter.grid(row=1)
+    label_SubjectID.grid(row=3)
+    label_logcsv.grid(row=0, pady=(50, 0))
+    button_save.grid(row=5, pady=(50, 0))
+    entry_Experimenter.grid(row=2)
+    entry_SubjectID.grid(row=4)
 
     root.mainloop()
 
@@ -601,5 +608,14 @@ def main():
     else:
         print('Data Error!')
 
-win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
-main()
+# win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
+# main()
+
+
+
+
+config_dict = load_dict('config.csv')
+condition_dict = load_dict('conditions.csv')
+task_dict = load_dict('Stimuli/Tasks/Tasks.csv')
+
+gui(config_dict, condition_dict, task_dict)
