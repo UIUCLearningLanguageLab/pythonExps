@@ -6,6 +6,7 @@ import random
 import os
 import collections
 import tkinter as tk
+from datetime import datetime
 
 EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
@@ -26,12 +27,21 @@ FEEDBACK = False
 RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
-def write_log():
-    # with open('experiment_log.csv', 'w') as f:
-    #     for key in config_dict.keys():
-    #         f.write("%s,%s\n" % (key, config_dict[key]))
-    #     f.close()
-    pass
+def write_log(task, trial_events, item_list):
+    with open('experiment_log.csv', 'a+') as f:
+        f_count = open('experiment_log.csv', 'r')
+        length = sum(1 for line in f_count)
+        f_count.close()
+        if length == 0:
+            header = ['Date', 'Time', 'Task', 'SOA', 'RP&List', 'SubjNum', 'Experimenter']
+            row = [datetime.now().date(), datetime.now().time(), task.get(), trial_events.get(), item_list.get(), SUBJECTID, EXPERIMENTER]
+            filewriter = csv.writer(f, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            filewriter.writerow(header)
+            filewriter.writerow(row)
+        elif length > 0:
+            row = [datetime.now().date(), datetime.now().time(), task.get(), trial_events.get(), item_list.get(), SUBJECTID, EXPERIMENTER]
+            filewriter = csv.writer(f, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            filewriter.writerow(row)
 
 
 def read_options():
@@ -73,8 +83,8 @@ def gui(config_dict, condition_dict, task_dict):
     experimenter = tk.StringVar()
     subjectid = tk.StringVar()
 
-    frame_topleft = tk.Frame(root, height=50, width=50)
-    frame_topleft.grid(row=0, column=0)
+    frame_topleft = tk.Frame(root, height=250, width=250)
+    frame_topleft.grid(row=0, column=0, sticky='nesw')
     label_configcsv = tk.Label(frame_topleft, text='config.csv', relief='solid')
     label_BLOCKS = tk.Label(frame_topleft, text='BLOCKS')
     label_KEY = tk.Label(frame_topleft, text='KEY')
@@ -88,7 +98,7 @@ def gui(config_dict, condition_dict, task_dict):
     option_menu_TASK = tk.OptionMenu(frame_topleft, task, *task_list)
     option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(frame_topleft, rand_within_blocks, "TRUE", "FALSE")
     option_menu_RAND_BLOCKS = tk.OptionMenu(frame_topleft, rand_blocks, "TRUE", "FALSE")
-    label_configcsv.grid(row=0, column=0, columnspan=2)
+    label_configcsv.grid(row=0, column=0, columnspan=2, pady=(5, 20))
     label_BLOCKS.grid(row=1, sticky='W')
     label_KEY.grid(row=2, sticky='W')
     label_TIMEOUT.grid(row=3, sticky='W')
@@ -102,20 +112,18 @@ def gui(config_dict, condition_dict, task_dict):
     option_menu_RAND_WITHIN_BLOCKS.grid(row=5, column=1, sticky='W')
     option_menu_RAND_BLOCKS.grid(row=6, column=1, sticky='W')
 
-
-    frame_topright = tk.Frame(root, height=500000000, width=50)
-    frame_topright.grid(row=0, column=1)
+    frame_topright = tk.Frame(root, height=250, width=250)
+    frame_topright.grid(row=0, column=1, sticky='nesw', padx=(30, 0))
     label_conditionscsv = tk.Label(frame_topright, text='conditions.csv', relief='solid')
     label_ITEM_LISTS = tk.Label(frame_topright, text='Item List')
     label_SOA = tk.Label(frame_topright, text='SOA')
     option_menu_item_lists = tk.OptionMenu(frame_topright, item_list, *item_lists_list)
     option_menu_soa = tk.OptionMenu(frame_topright, trial_events, *soa_list)
-    label_conditionscsv.grid(row=0, columnspan=2, sticky='N')
+    label_conditionscsv.grid(row=0, columnspan=2, sticky='N', pady=(5, 20))
     label_ITEM_LISTS.grid(row=1, sticky='NW')
     label_SOA.grid(row=2, sticky='NW')
     option_menu_item_lists.grid(row=1, column=1, sticky='NW')
     option_menu_soa.grid(row=2, column=1, sticky='NW')
-
 
     frame_bottom = tk.Frame(root)
     frame_bottom.grid(row=1, columnspan=2)
@@ -130,7 +138,7 @@ def gui(config_dict, condition_dict, task_dict):
     entry_SubjectID = tk.Entry(frame_bottom, textvariable=subjectid, justify='center')
     label_Experimenter.grid(row=1)
     label_SubjectID.grid(row=3)
-    label_logcsv.grid(row=0, pady=(50, 0))
+    label_logcsv.grid(row=0, pady=(50, 20))
     button_save.grid(row=5, pady=(50, 0))
     entry_Experimenter.grid(row=2)
     entry_SubjectID.grid(row=4)
@@ -164,6 +172,8 @@ def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, time
         for key in condition_dict.keys():
             f.write("%s,%s\n" % (key, condition_dict[key]))
         f.close()
+
+    write_log(task, trial_events, item_list)
 
     root.destroy()
 
