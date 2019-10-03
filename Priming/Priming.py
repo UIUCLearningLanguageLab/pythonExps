@@ -621,6 +621,9 @@ def main():
 
     gui(config_dict, condition_dict, task_dict)
 
+    global win
+    win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
+
     prepare(config_dict, condition_dict)
     item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
     trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
@@ -631,5 +634,4 @@ def main():
     else:
         print('Data Error!')
 
-win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
 main()
