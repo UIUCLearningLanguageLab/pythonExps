@@ -7,6 +7,7 @@ import os
 import collections
 import tkinter as tk
 from datetime import datetime
+from PIL import ImageTk, Image
 
 EVENT_TEXT_HEIGHT = 0.5
 EVENT_TEXT_FONT = 'Arial'
@@ -62,6 +63,7 @@ def read_options():
 
 def gui(config_dict, condition_dict, task_dict):
     root = tk.Tk()
+    root.title('Priming.py')
     item_lists_list, soa_list, task_list = read_options()
 
     blocks = tk.StringVar()
@@ -83,8 +85,17 @@ def gui(config_dict, condition_dict, task_dict):
     experimenter = tk.StringVar()
     subjectid = tk.StringVar()
 
+    frame_image = tk.Frame(root)
+    frame_image.grid(row=0, columnspan=2, pady=(0, 50))
+    path = 'superprime.jpg'
+    img = ImageTk.PhotoImage(Image.open(path).resize((350, 250)))
+    panel = tk.Label(frame_image, image=img)
+    panel.grid(row=0)
+
     frame_topleft = tk.Frame(root, height=250, width=250)
-    frame_topleft.grid(row=0, column=0, sticky='nesw')
+    frame_topleft.grid(row=1, column=0, sticky='nesw')
+    for column in [0, 1]:
+        frame_topleft.grid_columnconfigure(column, minsize=175)
     label_configcsv = tk.Label(frame_topleft, text='config.csv', relief='solid')
     label_BLOCKS = tk.Label(frame_topleft, text='BLOCKS')
     label_KEY = tk.Label(frame_topleft, text='KEY')
@@ -99,34 +110,36 @@ def gui(config_dict, condition_dict, task_dict):
     option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(frame_topleft, rand_within_blocks, "TRUE", "FALSE")
     option_menu_RAND_BLOCKS = tk.OptionMenu(frame_topleft, rand_blocks, "TRUE", "FALSE")
     label_configcsv.grid(row=0, column=0, columnspan=2, pady=(5, 20))
-    label_BLOCKS.grid(row=1, sticky='W')
-    label_KEY.grid(row=2, sticky='W')
-    label_TIMEOUT.grid(row=3, sticky='W')
-    label_TASK.grid(row=4, sticky='W')
-    label_RAND_WITHIN_BLOCK.grid(row=5, sticky='W')
-    label_RAND_BLOCKS.grid(row=6, sticky='W')
-    entry_BLOCKS.grid(row=1, column=1, sticky='W')
-    entry_KEY.grid(row=2, column=1, sticky='W')
-    entry_TIMEOUT.grid(row=3, column=1, sticky='W')
-    option_menu_TASK.grid(row=4, column=1, sticky='W')
-    option_menu_RAND_WITHIN_BLOCKS.grid(row=5, column=1, sticky='W')
-    option_menu_RAND_BLOCKS.grid(row=6, column=1, sticky='W')
+    label_BLOCKS.grid(row=1, sticky='e')
+    label_KEY.grid(row=2, sticky='e')
+    label_TIMEOUT.grid(row=3, sticky='e')
+    label_TASK.grid(row=4, sticky='e')
+    label_RAND_WITHIN_BLOCK.grid(row=5, sticky='e')
+    label_RAND_BLOCKS.grid(row=6, sticky='e')
+    entry_BLOCKS.grid(row=1, column=1, sticky='we')
+    entry_KEY.grid(row=2, column=1, sticky='we')
+    entry_TIMEOUT.grid(row=3, column=1, sticky='we')
+    option_menu_TASK.grid(row=4, column=1, sticky='we')
+    option_menu_RAND_WITHIN_BLOCKS.grid(row=5, column=1, sticky='we')
+    option_menu_RAND_BLOCKS.grid(row=6, column=1, sticky='we')
 
     frame_topright = tk.Frame(root, height=250, width=250)
-    frame_topright.grid(row=0, column=1, sticky='nesw', padx=(30, 0))
+    frame_topright.grid(row=1, column=1, sticky='nesw', padx=(30, 0))
+    for column in [0, 1]:
+        frame_topright.grid_columnconfigure(column, minsize=175)
     label_conditionscsv = tk.Label(frame_topright, text='conditions.csv', relief='solid')
     label_ITEM_LISTS = tk.Label(frame_topright, text='Item List')
     label_SOA = tk.Label(frame_topright, text='SOA')
     option_menu_item_lists = tk.OptionMenu(frame_topright, item_list, *item_lists_list)
     option_menu_soa = tk.OptionMenu(frame_topright, trial_events, *soa_list)
     label_conditionscsv.grid(row=0, columnspan=2, sticky='N', pady=(5, 20))
-    label_ITEM_LISTS.grid(row=1, sticky='NW')
-    label_SOA.grid(row=2, sticky='NW')
-    option_menu_item_lists.grid(row=1, column=1, sticky='NW')
-    option_menu_soa.grid(row=2, column=1, sticky='NW')
+    label_ITEM_LISTS.grid(row=1, sticky='e')
+    label_SOA.grid(row=2, sticky='e')
+    option_menu_item_lists.grid(row=1, column=1, sticky='we')
+    option_menu_soa.grid(row=2, column=1, sticky='we')
 
     frame_bottom = tk.Frame(root)
-    frame_bottom.grid(row=1, columnspan=2)
+    frame_bottom.grid(row=2, columnspan=2)
     label_Experimenter = tk.Label(frame_bottom, text='Experimenter')
     label_SubjectID = tk.Label(frame_bottom, text='Subject ID')
     label_logcsv = tk.Label(frame_bottom, text='experiment_log.csv', relief='solid')
@@ -152,8 +165,8 @@ def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, time
     config_dict['BLOCKS'] = blocks.get()
     config_dict['KEY'] = key.get()
     config_dict['TIMEOUT'] = timeout.get()
-    config_dict['NAME_SET'] = task_dict[str(config_dict["TASK"])]
     config_dict['TASK'] = task.get()
+    config_dict['NAME_SET'] = task_dict[str(config_dict['TASK'])]
     config_dict['RAND_WITHIN_BLOCKS'] = rand_within_blocks.get()
     config_dict['RAND_BLOCKS'] = rand_blocks.get()
 
@@ -618,14 +631,5 @@ def main():
     else:
         print('Data Error!')
 
-# win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
-# main()
-
-
-
-
-config_dict = load_dict('config.csv')
-condition_dict = load_dict('conditions.csv')
-task_dict = load_dict('Stimuli/Tasks/Tasks.csv')
-
-gui(config_dict, condition_dict, task_dict)
+win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
+main()
