@@ -86,13 +86,13 @@ def gui(config_dict, condition_dict, task_dict):
     subjectid = tk.StringVar()
 
     frame_image = tk.Frame(root)
-    frame_image.grid(row=0, columnspan=2, pady=(0, 50))
+    frame_image.grid(row=0, columnspan=2, pady=(0, 25))
     path = 'superprime.jpg'
     img = ImageTk.PhotoImage(Image.open(path).resize((350, 250)))
     panel = tk.Label(frame_image, image=img)
     panel.grid(row=0)
 
-    frame_topleft = tk.Frame(root, height=250, width=250)
+    frame_topleft = tk.Frame(root)
     frame_topleft.grid(row=1, column=0, sticky='nesw')
     for column in [0, 1]:
         frame_topleft.grid_columnconfigure(column, minsize=175)
@@ -109,7 +109,7 @@ def gui(config_dict, condition_dict, task_dict):
     option_menu_TASK = tk.OptionMenu(frame_topleft, task, *task_list)
     option_menu_RAND_WITHIN_BLOCKS = tk.OptionMenu(frame_topleft, rand_within_blocks, "TRUE", "FALSE")
     option_menu_RAND_BLOCKS = tk.OptionMenu(frame_topleft, rand_blocks, "TRUE", "FALSE")
-    label_configcsv.grid(row=0, column=0, columnspan=2, pady=(5, 20))
+    label_configcsv.grid(row=0, column=0, columnspan=2, pady=(5, 10))
     label_BLOCKS.grid(row=1, sticky='e')
     label_KEY.grid(row=2, sticky='e')
     label_TIMEOUT.grid(row=3, sticky='e')
@@ -123,7 +123,7 @@ def gui(config_dict, condition_dict, task_dict):
     option_menu_RAND_WITHIN_BLOCKS.grid(row=5, column=1, sticky='we')
     option_menu_RAND_BLOCKS.grid(row=6, column=1, sticky='we')
 
-    frame_topright = tk.Frame(root, height=250, width=250)
+    frame_topright = tk.Frame(root)
     frame_topright.grid(row=1, column=1, sticky='nesw', padx=(30, 0))
     for column in [0, 1]:
         frame_topright.grid_columnconfigure(column, minsize=175)
@@ -132,7 +132,7 @@ def gui(config_dict, condition_dict, task_dict):
     label_SOA = tk.Label(frame_topright, text='SOA')
     option_menu_item_lists = tk.OptionMenu(frame_topright, item_list, *item_lists_list)
     option_menu_soa = tk.OptionMenu(frame_topright, trial_events, *soa_list)
-    label_conditionscsv.grid(row=0, columnspan=2, sticky='N', pady=(5, 20))
+    label_conditionscsv.grid(row=0, columnspan=2, sticky='N', pady=(5, 10))
     label_ITEM_LISTS.grid(row=1, sticky='e')
     label_SOA.grid(row=2, sticky='e')
     option_menu_item_lists.grid(row=1, column=1, sticky='we')
@@ -151,8 +151,8 @@ def gui(config_dict, condition_dict, task_dict):
     entry_SubjectID = tk.Entry(frame_bottom, textvariable=subjectid, justify='center')
     label_Experimenter.grid(row=1)
     label_SubjectID.grid(row=3)
-    label_logcsv.grid(row=0, pady=(50, 20))
-    button_save.grid(row=5, pady=(50, 0))
+    label_logcsv.grid(row=0, pady=(25, 10))
+    button_save.grid(row=5, pady=(25, 0))
     entry_Experimenter.grid(row=2)
     entry_SubjectID.grid(row=4)
 
