@@ -160,8 +160,7 @@ def gui(config_dict, condition_dict, task_dict):
     entry_SubjectID.grid(row=4)
 
     root.mainloop()
-    return saved_changes.get()
-
+    return [saved_changes.get(), len(experimenter.get()), len(subjectid.get())]
 
 def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, timeout, task,
                  rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid, saved_changes):
@@ -627,7 +626,7 @@ def main():
 
     run_gui = gui(config_dict, condition_dict, task_dict)
 
-    if run_gui == 1:
+    if run_gui[0] == True & run_gui[1] > 0 & run_gui[2] > 0:
         global win
         win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
 
@@ -641,6 +640,6 @@ def main():
         else:
             print('Data Error!')
     else:
-        pass
+        print('Enter experimenter name, subject number, and hit run!')
 
 main()
