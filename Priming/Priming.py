@@ -29,6 +29,14 @@ RAND_BLOCKS = True
 RAND_WITHIN_BLOCKS = True
 
 def write_log(task, trial_events, item_list):
+    """
+    writes time-stamped experiment log
+
+    :param task: task that was selected in gui()
+    :param trial_events: SOA file that was selected in gui()
+    :param item_list: item_list that was selected in gui()
+    :return:
+    """
     with open('experiment_log.csv', 'a+') as f:
         f_count = open('experiment_log.csv', 'r')
         length = sum(1 for line in f_count)
@@ -46,6 +54,9 @@ def write_log(task, trial_events, item_list):
 
 
 def read_options():
+    """
+    reads directory for legal options for gui() and returns
+    """
     list_options = [os.path.splitext(file)[0] for file
                     in os.listdir('Stimuli/Item_Lists')]
     soa_options = [os.path.splitext(file)[0] for file
@@ -62,6 +73,14 @@ def read_options():
 
 
 def gui(config_dict, condition_dict, task_dict):
+    """
+    This is kind of a mess, but it works. Does two things: 1) displays GUI; 2) returns values to see if GUI had been
+    used correctly (checks to see if experimenter name and subject ID entries have been populated, makes sure that
+    the priming experiment does not run if experimenter hits the exit button)
+
+    :return: returns values that tell us if the experimenter had used the GUI correctly. These values are used in main()
+    to determine if the psychopy priming script should run.
+    """
     root = tk.Tk()
     root.title('Priming.py')
     item_lists_list, soa_list, task_list = read_options()
@@ -84,6 +103,8 @@ def gui(config_dict, condition_dict, task_dict):
     trial_events.set(condition_dict['trial_events'])
     experimenter = tk.StringVar()
     subjectid = tk.StringVar()
+    saved_changes = tk.BooleanVar()
+    saved_changes.set(0)
 
     frame_image = tk.Frame(root)
     frame_image.grid(row=0, columnspan=2, pady=(0, 25))
@@ -143,10 +164,11 @@ def gui(config_dict, condition_dict, task_dict):
     label_Experimenter = tk.Label(frame_bottom, text='Experimenter')
     label_SubjectID = tk.Label(frame_bottom, text='Subject ID')
     label_logcsv = tk.Label(frame_bottom, text='experiment_log.csv', relief='solid')
-    button_save = tk.Button(frame_bottom, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict, task_dict,
+    button_save = tk.Button(frame_bottom, text='Run!', command=lambda: save_changes(root, config_dict, condition_dict, task_dict,
                                                                              entry_BLOCKS, entry_KEY, entry_TIMEOUT,
                                                                              task, rand_within_blocks, rand_blocks,
-                                                                             item_list, trial_events, experimenter, subjectid))
+                                                                             item_list, trial_events, experimenter,
+                                                                             subjectid, saved_changes))
     entry_Experimenter = tk.Entry(frame_bottom, textvariable=experimenter, justify='center')
     entry_SubjectID = tk.Entry(frame_bottom, textvariable=subjectid, justify='center')
     label_Experimenter.grid(row=1)
@@ -157,10 +179,16 @@ def gui(config_dict, condition_dict, task_dict):
     entry_SubjectID.grid(row=4)
 
     root.mainloop()
-
+    return [saved_changes.get(), len(experimenter.get()), len(subjectid.get())]
 
 def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, timeout, task,
-                 rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid):
+                 rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid, saved_changes):
+    """
+    Also kind of a mess, but it works. Really should implement object-oriented programming at some point. This function
+    passes the tkinter variable values selected by the experimenter to the psychopy script so that it runs the
+    appropriate condition. It does so by a combination of just passing variables along, and also directly writing
+    the config.csv and conditions.csv files. Lastly, this function calls write_log() to write the experiment log.
+    """
     global EXPERIMENTER, SUBJECTID
     config_dict['BLOCKS'] = blocks.get()
     config_dict['KEY'] = key.get()
@@ -175,6 +203,8 @@ def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, time
 
     EXPERIMENTER = experimenter.get()
     SUBJECTID = subjectid.get()
+
+    saved_changes.set(1)
 
     with open('config.csv', 'w') as f:
         for key in config_dict.keys():
@@ -619,19 +649,22 @@ def main():
     condition_dict = load_dict('conditions.csv')
     task_dict = load_dict('Stimuli/Tasks/Tasks.csv')
 
-    gui(config_dict, condition_dict, task_dict)
+    run_gui = gui(config_dict, condition_dict, task_dict)
 
-    global win
-    win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
+    if (run_gui[0] is True) & (run_gui[1] > 0) & (run_gui[2] > 0):
+        global win
+        win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
 
-    prepare(config_dict, condition_dict)
-    item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
-    trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
-    if verify_items_and_events(item_data, trial_event_list):
-        assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
-        experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
-        show_instructions('Stimuli/Instructions/end.txt')
+        prepare(config_dict, condition_dict)
+        item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
+        trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
+        if verify_items_and_events(item_data, trial_event_list):
+            assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
+            experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
+            show_instructions('Stimuli/Instructions/end.txt')
+        else:
+            print('Data Error!')
     else:
-        print('Data Error!')
+        print('Enter experimenter name, subject number, and hit run!')
 
 main()
