@@ -84,6 +84,8 @@ def gui(config_dict, condition_dict, task_dict):
     trial_events.set(condition_dict['trial_events'])
     experimenter = tk.StringVar()
     subjectid = tk.StringVar()
+    saved_changes = tk.BooleanVar()
+    saved_changes.set(0)
 
     frame_image = tk.Frame(root)
     frame_image.grid(row=0, columnspan=2, pady=(0, 25))
@@ -143,10 +145,11 @@ def gui(config_dict, condition_dict, task_dict):
     label_Experimenter = tk.Label(frame_bottom, text='Experimenter')
     label_SubjectID = tk.Label(frame_bottom, text='Subject ID')
     label_logcsv = tk.Label(frame_bottom, text='experiment_log.csv', relief='solid')
-    button_save = tk.Button(frame_bottom, text='Run!', command=lambda : save_changes(root, config_dict, condition_dict, task_dict,
+    button_save = tk.Button(frame_bottom, text='Run!', command=lambda: save_changes(root, config_dict, condition_dict, task_dict,
                                                                              entry_BLOCKS, entry_KEY, entry_TIMEOUT,
                                                                              task, rand_within_blocks, rand_blocks,
-                                                                             item_list, trial_events, experimenter, subjectid))
+                                                                             item_list, trial_events, experimenter,
+                                                                             subjectid, saved_changes))
     entry_Experimenter = tk.Entry(frame_bottom, textvariable=experimenter, justify='center')
     entry_SubjectID = tk.Entry(frame_bottom, textvariable=subjectid, justify='center')
     label_Experimenter.grid(row=1)
@@ -157,10 +160,11 @@ def gui(config_dict, condition_dict, task_dict):
     entry_SubjectID.grid(row=4)
 
     root.mainloop()
+    return saved_changes.get()
 
 
 def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, timeout, task,
-                 rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid):
+                 rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid, saved_changes):
     global EXPERIMENTER, SUBJECTID
     config_dict['BLOCKS'] = blocks.get()
     config_dict['KEY'] = key.get()
@@ -175,6 +179,8 @@ def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, time
 
     EXPERIMENTER = experimenter.get()
     SUBJECTID = subjectid.get()
+
+    saved_changes.set(1)
 
     with open('config.csv', 'w') as f:
         for key in config_dict.keys():
@@ -619,19 +625,22 @@ def main():
     condition_dict = load_dict('conditions.csv')
     task_dict = load_dict('Stimuli/Tasks/Tasks.csv')
 
-    gui(config_dict, condition_dict, task_dict)
+    run_gui = gui(config_dict, condition_dict, task_dict)
 
-    global win
-    win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
+    if run_gui == 1:
+        global win
+        win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
 
-    prepare(config_dict, condition_dict)
-    item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
-    trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
-    if verify_items_and_events(item_data, trial_event_list):
-        assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
-        experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
-        show_instructions('Stimuli/Instructions/end.txt')
+        prepare(config_dict, condition_dict)
+        item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
+        trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
+        if verify_items_and_events(item_data, trial_event_list):
+            assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
+            experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
+            show_instructions('Stimuli/Instructions/end.txt')
+        else:
+            print('Data Error!')
     else:
-        print('Data Error!')
+        pass
 
 main()
