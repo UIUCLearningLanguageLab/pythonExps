@@ -14,14 +14,12 @@ def subjs_remaining(csv):
                 pass
     output_df = output_df.sample(n=num_to_run).reset_index().drop('index', axis=1).drop('number', axis=1)
     output_df.rename(columns={'biggest_subj_num': 'subj_num'}, inplace=True)
-    print(output_df)
 
     tracker_dict = {}
     for index, row in output_df.iterrows():
         cond = str(row['task']) + '_' + str(row['soa']) + '_' + str(row['rp']) + '_' + str(row['list'])
         tracker(row, cond, tracker_dict)
         output_df.at[index, 'subj_num'] = tracker_dict[str(cond)]
-    # print(output_df)
     return output_df
 
 
