@@ -633,7 +633,7 @@ def prepare(config_dict, condition_dict):
     # get the condition in random
     CONDITION = str(conditions[random.randint(0, len(conditions) - 1)])
     # randomly generate a subject id
-    SUBJECTID = random.randint(10 ** 5, 10 ** 6)
+    # SUBJECTID = random.randint(10 ** 5, 10 ** 6)
     # generate the file name for output
     task_rp_list = ITEM_LIST.split('_')
     task = task_rp_list[0]
