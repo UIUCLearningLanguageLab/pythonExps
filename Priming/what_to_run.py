@@ -33,7 +33,8 @@ def tracker(row, cond, tracker_dict):
 
 def main():
     csv_df = pd.read_csv('subj_num_log.csv')
-    subjs_remaining(csv_df)
+    to_run = subjs_remaining(csv_df)
+    to_run.to_csv('to_run.csv')
 
 
 main()
