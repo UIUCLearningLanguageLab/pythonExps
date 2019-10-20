@@ -3,7 +3,7 @@ import pandas as pd
 num_to_run = 4
 
 
-def subjs_remaining(csv):
+def give_subjs(csv):
 
     output_df = csv[csv['number']!=0]
     for index, row in output_df.iterrows():
@@ -33,7 +33,7 @@ def tracker(row, cond, tracker_dict):
 
 def main():
     csv_df = pd.read_csv('subj_num_log.csv')
-    to_run = subjs_remaining(csv_df)
+    to_run = give_subjs(csv_df)
     to_run.to_csv('to_run.csv')
 
 
