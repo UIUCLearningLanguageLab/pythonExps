@@ -574,7 +574,6 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
                 type = 'W'
                 duration = 0
                 valid_key_list.extend(key.split())
-                print(valid_key_list)
             else:
                 str = trial_event_list[j][1][0]
                 if str == 'W':
