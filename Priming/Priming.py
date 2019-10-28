@@ -181,6 +181,7 @@ def gui(config_dict, condition_dict, task_dict):
     root.mainloop()
     return [saved_changes.get(), len(experimenter.get()), len(subjectid.get())]
 
+
 def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, timeout, task,
                  rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid, saved_changes):
     """
