@@ -9,7 +9,7 @@ import tkinter as tk
 from datetime import datetime
 from PIL import ImageTk, Image
 
-EVENT_TEXT_HEIGHT = 0.5
+EVENT_TEXT_HEIGHT = 0.1
 EVENT_TEXT_FONT = 'Arial'
 EVENT_TEXT_COLOR = 'pink'
 
@@ -234,7 +234,10 @@ def display_instruction_words(instruction_text):
                             italic=False)
     words.draw()
     win.flip()
-    key_press = event.waitKeys(keyList=['space'])
+    key_press = event.waitKeys(keyList=['space', 'escape'])
+
+    if 'escape' in key_press:
+        core.quit()
 
 
 def display_event_words(event_text, duration, key_list, type):
@@ -333,6 +336,8 @@ def display_event_words(event_text, duration, key_list, type):
             timeUse_action = timer.getTime()
             return round(timeUse_display * 1000, 4), 'null', round(timeUse_action * 1000, 4)
         timeUse_action = timer.getTime()
+        if 'escape' in key_press:
+            core.quit()
         return round(timeUse_display * 1000, 4), key_press[0], round(timeUse_action * 1000, 4)
 
 
@@ -561,14 +566,15 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
         row.extend(item_data_frame.iloc[i, 1:-1])
 
         for j in range(num_events):
-            valid_key_list = ''
+            valid_key_list = ['escape'] #esc key is default escape from program
             event_name = trial_event_list[j][0]
             type = 'N'
             # if this step need a key press
             if trial_event_list[j][1] == "KEY":
                 type = 'W'
                 duration = 0
-                valid_key_list = key.split()
+                valid_key_list.extend(key.split())
+                print(valid_key_list)
             else:
                 str = trial_event_list[j][1][0]
                 if str == 'W':
@@ -588,7 +594,7 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
             else:
                 # need display the pairs
                 event_text = item_data_frame.loc[i, event_name]
-                if valid_key_list != '':
+                if valid_key_list != ['escape']:
                     res = display_event_words(event_text, duration, valid_key_list, type)
                     corr_response = item_data_frame.loc[i, 'Corr_response'].astype('str')
                     # if feedback is need, display the sound and text
@@ -653,7 +659,7 @@ def main():
 
     if (run_gui[0] is True) & (run_gui[1] > 0) & (run_gui[2] > 0):
         global win
-        win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=False)
+        win = visual.Window(size=(1000, 600), color=(-1, -1, -1), fullscr=True)
 
         prepare(config_dict, condition_dict)
         item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
