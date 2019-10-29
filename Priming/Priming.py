@@ -337,6 +337,8 @@ def display_event_words(event_text, duration, key_list, type):
             timeUse_action = timer.getTime()
             return round(timeUse_display * 1000, 4), 'null', round(timeUse_action * 1000, 4)
         timeUse_action = timer.getTime()
+        if key_press[0] in ['num_1', 'num_2', 'num_3', 'num_4', 'num_5', 'num_6', 'num_7', 'num_8', 'num_9', 'num_0']:
+            key_press[0] = key_press[0][-1]
         if 'escape' in key_press:
             core.quit()
         return round(timeUse_display * 1000, 4), key_press[0], round(timeUse_action * 1000, 4)
@@ -567,7 +569,8 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
         row.extend(item_data_frame.iloc[i, 1:-1])
 
         for j in range(num_events):
-            valid_key_list = ['escape'] #esc key is default escape from program
+            valid_key_list = ['escape']
+            # esc key is default escape from program
             event_name = trial_event_list[j][0]
             type = 'N'
             # if this step need a key press
