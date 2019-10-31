@@ -37,7 +37,7 @@ def write_log(task, trial_events, item_list):
     :param item_list: item_list that was selected in gui()
     :return:
     """
-    with open('experiment_log.csv', 'a+') as f:
+    with open('experiment_log.csv', 'a+', newline='') as f:
         f_count = open('experiment_log.csv', 'r')
         length = sum(1 for line in f_count)
         f_count.close()
@@ -506,7 +506,7 @@ def prepare_output_header(assigned_item_data, trial_block_list, trial_event_list
     header_row.extend(('Key_response', 'RT'))
     header_row.append('ITI_Time')
 
-    with open('Data/' + FILE_NAME + '.csv', 'w') as csvfile:
+    with open('Data/' + FILE_NAME + '.csv', 'w', newline='') as csvfile:
         filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         filewriter.writerow(header_row)
 
@@ -621,7 +621,7 @@ def block(item_data_frame, trial_event_list, block_num, config_dict):
                     timer.reset()
                     res = display_event_words(event_text, duration, None, type)
                     row.append(res)
-        with open('Data/' + FILE_NAME + '.csv', 'a') as csvfile:
+        with open('Data/' + FILE_NAME + '.csv', 'a', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(row)
 
