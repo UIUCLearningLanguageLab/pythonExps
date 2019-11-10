@@ -419,8 +419,16 @@ def prepare_pairs(item_data, config_dict):
     if 'Feedback' in item_data.columns.values.tolist():
         FEEDBACK = True
     num_blocks = int(config_dict['BLOCKS'])
-    name_set = config_dict['NAME_SET'].split(' ')
+    # reading name_set from item_data
+    name_set, idx = np.unique(item_data["Block_Name"], return_index=True)
+    name_set = name_set[np.argsort(idx)]
+    name_set = list(name_set)
     num_items = len(item_data)
+
+    if RAND_BLOCKS == True:
+        copy = name_set[1:]
+        random.shuffle(copy)
+        name_set[1:] = copy
 
     # for situation with only PRACTICE and TEST
     if num_blocks > 0:
@@ -438,11 +446,6 @@ def prepare_pairs(item_data, config_dict):
                 current_block += 1
             else:
                 current_block = 1
-        if RAND_BLOCKS == True:
-            block_list_copy = block_list[count:]
-            # shuffle the list of block numbers
-            random.shuffle(block_list_copy)
-            block_list[count:] = block_list_copy
 
         # assign the block number to "Block" column
         for i in range(len(item_data)):
@@ -464,7 +467,7 @@ def prepare_pairs(item_data, config_dict):
 
         practice_list = practice_list.reset_index(drop=True)
 
-        return item_data, trial_block_list, practice_list
+        return item_data, trial_block_list, practice_list, name_set
     # for situations with other than TEST
     else:
         for i in range(num_items):
@@ -485,7 +488,7 @@ def prepare_pairs(item_data, config_dict):
 
         practice_list = practice_list.reset_index(drop=True)
 
-        return item_data, trial_block_list, practice_list
+        return item_data, trial_block_list, practice_list, name_set
 
 
 def prepare_output_header(assigned_item_data, trial_block_list, trial_event_list, config_dict):
@@ -511,7 +514,8 @@ def prepare_output_header(assigned_item_data, trial_block_list, trial_event_list
         filewriter.writerow(header_row)
 
 
-def experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict):
+def experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict,
+               name_set):
     """
     This is the experiment function
     """
@@ -543,7 +547,7 @@ def experiment(assigned_item_data, trial_block_list, trial_event_list, config_di
         name_flag = True
     for i in range(1, num_blocks + 1):
         if name_flag:
-            block_name = config_dict['NAME_SET'].split(' ')[i]
+            block_name = name_set[i]
         else:
             block_name = 'TEST'
         show_instructions('Stimuli/Instructions/block_instructions.txt', block_name)
@@ -668,8 +672,9 @@ def main():
         item_data = load_data('Stimuli/Item_Lists/' + ITEM_LIST + '.csv')
         trial_event_list = load_trial_events('Events/' + CONDITION + '.csv')
         if verify_items_and_events(item_data, trial_event_list):
-            assigned_item_data, trial_block_list, practice_list = prepare_pairs(item_data, config_dict)
-            experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list, condition_dict)
+            assigned_item_data, trial_block_list, practice_list, name_set = prepare_pairs(item_data, config_dict)
+            experiment(assigned_item_data, trial_block_list, trial_event_list, config_dict, practice_list,
+                       condition_dict, name_set)
             show_instructions('Stimuli/Instructions/end.txt')
         else:
             print('Data Error!')
