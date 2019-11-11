@@ -72,7 +72,7 @@ def read_options():
     return list_options, soa_options, task_options
 
 
-def gui(config_dict, condition_dict, task_dict):
+def gui(config_dict, condition_dict):
     """
     This is kind of a mess, but it works. Does two things: 1) displays GUI; 2) returns values to see if GUI had been
     used correctly (checks to see if experimenter name and subject ID entries have been populated, makes sure that
@@ -83,6 +83,8 @@ def gui(config_dict, condition_dict, task_dict):
     """
     root = tk.Tk()
     root.title('Priming.py')
+    # root.geometry("750x700")
+    # root.resizable(0, 0)
     item_lists_list, soa_list, task_list = read_options()
 
     blocks = tk.StringVar()
@@ -164,7 +166,7 @@ def gui(config_dict, condition_dict, task_dict):
     label_Experimenter = tk.Label(frame_bottom, text='Experimenter')
     label_SubjectID = tk.Label(frame_bottom, text='Subject ID')
     label_logcsv = tk.Label(frame_bottom, text='experiment_log.csv', relief='solid')
-    button_save = tk.Button(frame_bottom, text='Run!', command=lambda: save_changes(root, config_dict, condition_dict, task_dict,
+    button_save = tk.Button(frame_bottom, text='Run!', command=lambda: save_changes(root, config_dict, condition_dict,
                                                                              entry_BLOCKS, entry_KEY, entry_TIMEOUT,
                                                                              task, rand_within_blocks, rand_blocks,
                                                                              item_list, trial_events, experimenter,
@@ -182,7 +184,7 @@ def gui(config_dict, condition_dict, task_dict):
     return [saved_changes.get(), len(experimenter.get()), len(subjectid.get())]
 
 
-def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, timeout, task,
+def save_changes(root, config_dict, condition_dict, blocks, key, timeout, task,
                  rand_within_blocks, rand_blocks, item_list, trial_events, experimenter, subjectid, saved_changes):
     """
     Also kind of a mess, but it works. Really should implement object-oriented programming at some point. This function
@@ -195,7 +197,6 @@ def save_changes(root, config_dict, condition_dict, task_dict, blocks, key, time
     config_dict['KEY'] = key.get()
     config_dict['TIMEOUT'] = timeout.get()
     config_dict['TASK'] = task.get()
-    config_dict['NAME_SET'] = task_dict[str(config_dict['TASK'])]
     config_dict['RAND_WITHIN_BLOCKS'] = rand_within_blocks.get()
     config_dict['RAND_BLOCKS'] = rand_blocks.get()
 
@@ -487,7 +488,6 @@ def prepare_pairs(item_data, config_dict):
             trial_block_list.append(block_dataframe.reset_index())
 
         practice_list = practice_list.reset_index(drop=True)
-
         return item_data, trial_block_list, practice_list, name_set
 
 
@@ -645,8 +645,6 @@ def prepare(config_dict, condition_dict):
     conditions = condition_dict['trial_events'].split(' ')
     # get the condition in random
     CONDITION = str(conditions[random.randint(0, len(conditions) - 1)])
-    # randomly generate a subject id
-    # SUBJECTID = random.randint(10 ** 5, 10 ** 6)
     # generate the file name for output
     task_rp_list = ITEM_LIST.split('_')
     task = task_rp_list[0]
@@ -660,9 +658,8 @@ def prepare(config_dict, condition_dict):
 def main():
     config_dict = load_dict('config.csv')
     condition_dict = load_dict('conditions.csv')
-    task_dict = load_dict('Stimuli/Tasks/Tasks.csv')
 
-    run_gui = gui(config_dict, condition_dict, task_dict)
+    run_gui = gui(config_dict, condition_dict)
 
     if (run_gui[0] is True) & (run_gui[1] > 0) & (run_gui[2] > 0):
         global win
