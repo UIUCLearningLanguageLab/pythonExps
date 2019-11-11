@@ -1,6 +1,6 @@
 import pandas as pd
 
-num_to_run = 4
+num_to_run = 290
 
 
 def give_subjs(csv):
@@ -14,7 +14,6 @@ def give_subjs(csv):
                 pass
     output_df = output_df.sample(n=num_to_run).reset_index().drop('index', axis=1).drop('number', axis=1)
     output_df.rename(columns={'biggest_subj_num': 'subj_num'}, inplace=True)
-
     tracker_dict = {}
     for index, row in output_df.iterrows():
         cond = str(row['task']) + '_' + str(row['soa']) + '_' + str(row['rp']) + '_' + str(row['list'])
@@ -27,7 +26,7 @@ def tracker(row, cond, tracker_dict):
     try:
         tracker_dict[str(cond)] += 1
     except KeyError:
-        tracker_dict[str(cond)] = row['subj_num']
+        tracker_dict[str(cond)] = row['subj_num'] + 1
     return tracker_dict
 
 
