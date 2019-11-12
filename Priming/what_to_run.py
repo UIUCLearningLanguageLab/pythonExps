@@ -5,14 +5,14 @@ num_to_run = 290
 
 def give_subjs(csv):
 
-    output_df = csv[csv['number']!=0]
+    output_df = csv[csv['n_to_run']!=0]
     for index, row in output_df.iterrows():
-        for num in range(row['number'] - 1):
-            if row['number'] > 1:
+        for num in range(row['n_to_run'] - 1):
+            if row['n_to_run'] > 1:
                 output_df = output_df.append(row)
             else:
                 pass
-    output_df = output_df.sample(n=num_to_run).reset_index().drop('index', axis=1).drop('number', axis=1)
+    output_df = output_df.sample(n=num_to_run).reset_index().drop('index', axis=1).drop('n_to_run', axis=1).drop('n', axis=1)
     output_df.rename(columns={'biggest_subj_num': 'subj_num'}, inplace=True)
     tracker_dict = {}
     for index, row in output_df.iterrows():
