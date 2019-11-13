@@ -31,7 +31,7 @@ def tracker(row, cond, tracker_dict):
 
 
 def main():
-    csv_df = pd.read_csv('subj_num_log.csv')
+    csv_df = pd.read_csv('Superprime_Subject_Counts.csv')
     to_run = give_subjs(csv_df)
     to_run.to_csv('to_run.csv')
 

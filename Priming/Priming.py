@@ -420,6 +420,7 @@ def prepare_pairs(item_data, config_dict):
     if 'Feedback' in item_data.columns.values.tolist():
         FEEDBACK = True
     num_blocks = int(config_dict['BLOCKS'])
+
     # reading name_set from item_data
     name_set, idx = np.unique(item_data["Block_Name"], return_index=True)
     name_set = name_set[np.argsort(idx)]
