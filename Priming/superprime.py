@@ -462,6 +462,7 @@ class SuperPrime:
         conditions = self.condition_dict['trial_events'].split(' ')
         # get the condition in random
         self.CONDITION = str(conditions[random.randint(0, len(conditions) - 1)])
+        self.SUBJECTID = self.condition_dict['subj_id']
         # generate the file name for output
         task_rp_list = self.ITEM_LIST.split('_')
         task = task_rp_list[0]
